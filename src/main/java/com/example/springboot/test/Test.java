@@ -17,49 +17,48 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Test {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private String title;
+    @Column(nullable = false)
+    private String title;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String content;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String content;
 
-	@CreatedDate
-	@Column(nullable = false, updatable = false)
-	private Instant createdAt;
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
-	@LastModifiedDate
-	@Column(nullable = false)
-	private Instant updatedAt;
+    @LastModifiedDate
+    @Column(nullable = false)
+    private Instant updatedAt;
 
-	protected Test() {
-	}
+    protected Test() {}
 
-	public Test(String title, String content) {
-		this.title = title;
-		this.content = content;
-	}
+    public Test(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public Instant getCreatedAt() {
-		return createdAt;
-	}
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 
-	public Instant getUpdatedAt() {
-		return updatedAt;
-	}
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 }
