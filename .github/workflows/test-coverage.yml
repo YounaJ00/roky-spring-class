@@ -1,0 +1,71 @@
+name: Test Coverage
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: spring_boot
+          MYSQL_USER: spring_boot
+          MYSQL_PASSWORD: spring_boot
+          MYSQL_ROOT_PASSWORD: root-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -proot-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: spring_boot
+      MYSQL_USER: spring_boot
+      MYSQL_PASSWORD: spring_boot
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: temurin
+          cache: gradle
+
+      - name: Run tests and generate coverage report
+        run: |
+          ./gradlew test --stacktrace > test-output.log 2>&1 || (cat test-output.log && exit 1)
+
+      - name: Upload test logs and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-and-reports
+          path: |
+            test-output.log
+            build/reports/jacoco/test/
+            build/test-results/
+          retention-days: 30
+
+      - name: Comment coverage on pull request
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.2
+        with:
+          title: 📝 Test coverage report
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 50
+          min-coverage-changed-files: 50
