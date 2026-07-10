@@ -1,6 +1,7 @@
 plugins {
 	id 'java'
 	id 'jacoco'
+	id 'com.diffplug.spotless' version '8.8.0'
 	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -40,5 +41,17 @@ tasks.named('jacocoTestReport') {
 	reports {
 		xml.required = true
 		html.required = true
+	}
+}
+
+spotless {
+	java {
+		googleJavaFormat().aosp()
+	}
+
+	format 'misc', {
+		target '*.gradle', '.gitattributes', '.gitignore', '.github/**/*.yml'
+		trimTrailingWhitespace()
+		endWithNewline()
 	}
 }
