@@ -1,64 +1,53 @@
 package com.example.springboot.test;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.Instant;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Entity
-@Table(name = "test")
-@EntityListeners(AuditingEntityListener.class)
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Test {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
     private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
     private Instant updatedAt;
 
-    protected Test() {}
-
-    public Test(String title, String content) {
-        this.title = title;
-        this.content = content;
+    public static Test create(String title, String content) {
+        return new Test(
+                null, requireText(title, "title"), requireText(content, "content"), null, null);
     }
 
-    public Long getId() {
-        return id;
+    public static Test reconstitute(
+            Long id, String title, String content, Instant createdAt, Instant updatedAt) {
+        return new Test(
+                id,
+                requireText(title, "title"),
+                requireText(content, "content"),
+                createdAt,
+                updatedAt);
     }
 
-    public String getTitle() {
-        return title;
+    /**
+     * 제목과 본문을 함께 변경합니다. 둘 중 하나라도 비어 있으면 어떤 값도 바뀌지 않습니다.
+     *
+     * @param title 새 제목, 공백일 수 없음
+     * @param content 새 본문, 공백일 수 없음
+     * @throws IllegalArgumentException 제목 또는 본문이 공백인 경우
+     */
+    public void update(String title, String content) {
+        String validatedTitle = requireText(title, "title");
+        String validatedContent = requireText(content, "content");
+        this.title = validatedTitle;
+        this.content = validatedContent;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
+    private static String requireText(String value, String fieldName) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " must not be blank");
+        }
+        return value;
     }
 }
