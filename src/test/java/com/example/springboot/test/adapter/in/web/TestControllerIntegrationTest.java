@@ -188,4 +188,20 @@ class TestControllerIntegrationTest {
                 .as("방금 저장한 리소스가 목록에 포함된다")
                 .isTrue();
     }
+
+    @org.junit.jupiter.api.Test
+    @DisplayName("본문이 매우 길어도 잘리지 않고 그대로 저장된다")
+    void 긴_본문도_잘리지_않고_저장된다() {
+        // Given
+        String longContent = "가".repeat(10_000);
+
+        // When
+        long id = createAndGetId("긴 본문", longContent);
+
+        // Then
+        JsonNode refetched = json(mockMvc.get().uri("/api/tests/" + id).exchange());
+        assertThat(refetched.get("content").asString())
+                .as("본문이 TEXT가 아닌 기본 VARCHAR(255)로 매핑되면 저장 시점에 잘린다")
+                .isEqualTo(longContent);
+    }
 }
