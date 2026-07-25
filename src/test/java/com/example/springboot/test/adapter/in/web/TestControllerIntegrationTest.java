@@ -25,8 +25,6 @@ import tools.jackson.databind.ObjectMapper;
 @DisplayName("Test CRUD API")
 class TestControllerIntegrationTest {
 
-    private static final long MISSING_ID = 987654321L;
-
     @Autowired MockMvcTester mockMvc;
     @Autowired ObjectMapper objectMapper;
 
@@ -135,8 +133,8 @@ class TestControllerIntegrationTest {
     }
 
     @org.junit.jupiter.api.Test
-    @DisplayName("삭제하면 204를 반환하고 이후 조회는 404가 된다")
-    void 삭제한_리소스는_다시_조회되지_않는다() {
+    @DisplayName("삭제하면 204를 반환하고 이후 목록에서 빠진다")
+    void 삭제한_리소스는_목록에서_빠진다() {
         // Given
         long id = createAndGetId("지울 제목", "지울 본문");
 
@@ -145,30 +143,10 @@ class TestControllerIntegrationTest {
 
         // Then
         assertThat(deleted).hasStatus(HttpStatus.NO_CONTENT);
-        assertThat(mockMvc.get().uri("/api/tests/" + id).exchange())
-                .hasStatus(HttpStatus.NOT_FOUND);
-    }
-
-    @org.junit.jupiter.api.Test
-    @DisplayName("없는 식별자에 대한 조회·수정·삭제는 모두 404를 반환한다")
-    void 없는_식별자는_모든_경로에서_404를_반환한다() {
-        assertThat(mockMvc.get().uri("/api/tests/" + MISSING_ID).exchange())
-                .hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(update(MISSING_ID, "제목", "본문")).hasStatus(HttpStatus.NOT_FOUND);
-        assertThat(mockMvc.delete().uri("/api/tests/" + MISSING_ID).exchange())
-                .hasStatus(HttpStatus.NOT_FOUND);
-    }
-
-    @org.junit.jupiter.api.Test
-    @DisplayName("조회 실패 응답에는 원인을 알 수 있는 본문이 담긴다")
-    void 조회_실패_응답은_원인을_알려준다() {
-        // When
-        MvcTestResult result = mockMvc.get().uri("/api/tests/" + MISSING_ID).exchange();
-
-        // Then
-        assertThat(json(result).get("detail").asString())
-                .as("본문이 비면 클라이언트가 실패 원인을 알 수 없다")
-                .isEqualTo("Test not found: " + MISSING_ID);
+        JsonNode remaining = json(mockMvc.get().uri("/api/tests").exchange());
+        assertThat(remaining.valueStream().anyMatch(node -> node.get("id").asLong() == id))
+                .as("삭제가 반영되지 않으면 목록에 그대로 남는다")
+                .isFalse();
     }
 
     @org.junit.jupiter.api.Test

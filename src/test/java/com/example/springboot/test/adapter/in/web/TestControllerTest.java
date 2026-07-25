@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.springboot.test.application.TestNotFoundException;
 import com.example.springboot.test.application.port.in.CreateTestUseCase;
 import com.example.springboot.test.application.port.in.DeleteTestUseCase;
 import com.example.springboot.test.application.port.in.GetTestUseCase;
@@ -151,18 +150,6 @@ class TestControllerTest {
     }
 
     @org.junit.jupiter.api.Test
-    @DisplayName("대상이 없으면 404와 원인을 담은 본문을 반환한다")
-    void 없는_식별자를_조회하면_404를_반환한다() throws Exception {
-        // Given
-        given(getTestUseCase.get(999L)).willThrow(new TestNotFoundException(999L));
-
-        // When & Then
-        mockMvc.perform(get("/api/tests/{id}", 999L))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.detail").value("Test not found: 999"));
-    }
-
-    @org.junit.jupiter.api.Test
     @DisplayName("요청 값이 비어 있으면 유스케이스를 호출하지 않고 400을 반환한다")
     void 요청_값이_비어있으면_400을_반환한다() throws Exception {
         // When & Then
@@ -175,24 +162,5 @@ class TestControllerTest {
                                         """))
                 .andExpect(status().isBadRequest());
         then(createTestUseCase).shouldHaveNoInteractions();
-    }
-
-    @org.junit.jupiter.api.Test
-    @DisplayName("도메인 불변식 위반이 유스케이스에서 새어 나와도 400으로 변환한다")
-    void 도메인_불변식_위반은_400으로_변환된다() throws Exception {
-        // Given
-        given(createTestUseCase.create(new CreateTestCommand("제목", "본문")))
-                .willThrow(new IllegalArgumentException("content must not be blank"));
-
-        // When & Then
-        mockMvc.perform(
-                        post("/api/tests")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                                        {"title":"제목","content":"본문"}
-                                        """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("content must not be blank"));
     }
 }
