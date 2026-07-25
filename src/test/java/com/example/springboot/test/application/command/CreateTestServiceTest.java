@@ -1,4 +1,4 @@
-package com.example.springboot.test.application.service;
+package com.example.springboot.test.application.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
