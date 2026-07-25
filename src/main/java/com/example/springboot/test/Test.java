@@ -30,9 +30,18 @@ public class Test {
                 updatedAt);
     }
 
+    /**
+     * 제목과 본문을 함께 변경합니다. 둘 중 하나라도 비어 있으면 어떤 값도 바뀌지 않습니다.
+     *
+     * @param title 새 제목, 공백일 수 없음
+     * @param content 새 본문, 공백일 수 없음
+     * @throws IllegalArgumentException 제목 또는 본문이 공백인 경우
+     */
     public void update(String title, String content) {
-        this.title = requireText(title, "title");
-        this.content = requireText(content, "content");
+        String validatedTitle = requireText(title, "title");
+        String validatedContent = requireText(content, "content");
+        this.title = validatedTitle;
+        this.content = validatedContent;
     }
 
     private static String requireText(String value, String fieldName) {
@@ -40,25 +49,5 @@ public class Test {
             throw new IllegalArgumentException(fieldName + " must not be blank");
         }
         return value;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

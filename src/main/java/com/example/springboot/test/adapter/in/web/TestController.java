@@ -8,6 +8,7 @@ import com.example.springboot.test.application.port.in.DeleteTestUseCase;
 import com.example.springboot.test.application.port.in.GetTestUseCase;
 import com.example.springboot.test.application.port.in.ListTestsUseCase;
 import com.example.springboot.test.application.port.in.UpdateTestUseCase;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class TestController {
     private final DeleteTestUseCase deleteTestUseCase;
 
     @PostMapping
-    public ResponseEntity<TestResponse> create(@RequestBody CreateTestRequest request) {
+    public ResponseEntity<TestResponse> create(@Valid @RequestBody CreateTestRequest request) {
         TestResponse response = TestResponse.from(createTestUseCase.create(request.toCommand()));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -49,7 +50,8 @@ public class TestController {
     }
 
     @PutMapping("/{id}")
-    public TestResponse update(@PathVariable Long id, @RequestBody UpdateTestRequest request) {
+    public TestResponse update(
+            @PathVariable Long id, @Valid @RequestBody UpdateTestRequest request) {
         return TestResponse.from(updateTestUseCase.update(id, request.toCommand()));
     }
 

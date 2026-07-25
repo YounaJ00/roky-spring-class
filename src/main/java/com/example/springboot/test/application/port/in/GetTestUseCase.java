@@ -1,8 +1,8 @@
 package com.example.springboot.test.application.port.in;
 
-import com.example.springboot.test.Test;
+import com.example.springboot.test.application.port.in.dto.TestResult;
 
 public interface GetTestUseCase {
 
-    Test get(Long id);
+    TestResult get(Long id);
 }

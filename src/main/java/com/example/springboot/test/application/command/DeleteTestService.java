@@ -1,10 +1,7 @@
 package com.example.springboot.test.application.command;
 
-import com.example.springboot.test.Test;
-import com.example.springboot.test.application.TestNotFoundException;
 import com.example.springboot.test.application.port.in.DeleteTestUseCase;
-import com.example.springboot.test.application.port.out.TestCommandPersistencePort;
-import com.example.springboot.test.application.port.out.TestQueryPersistencePort;
+import com.example.springboot.test.application.port.out.TestPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,17 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DeleteTestService implements DeleteTestUseCase {
 
-    private final TestCommandPersistencePort testCommandPersistencePort;
-    private final TestQueryPersistencePort testQueryPersistencePort;
+    private final TestPersistencePort testPersistencePort;
 
     @Override
     public void delete(Long id) {
-        testCommandPersistencePort.delete(findById(id));
-    }
-
-    private Test findById(Long id) {
-        return testQueryPersistencePort
-                .findById(id)
-                .orElseThrow(() -> new TestNotFoundException(id));
+        testPersistencePort.getOrThrow(id);
+        testPersistencePort.deleteById(id);
     }
 }

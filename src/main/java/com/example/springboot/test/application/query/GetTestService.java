@@ -1,9 +1,8 @@
 package com.example.springboot.test.application.query;
 
-import com.example.springboot.test.Test;
-import com.example.springboot.test.application.TestNotFoundException;
 import com.example.springboot.test.application.port.in.GetTestUseCase;
-import com.example.springboot.test.application.port.out.TestQueryPersistencePort;
+import com.example.springboot.test.application.port.in.dto.TestResult;
+import com.example.springboot.test.application.port.out.TestPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GetTestService implements GetTestUseCase {
 
-    private final TestQueryPersistencePort testQueryPersistencePort;
+    private final TestPersistencePort testPersistencePort;
 
     @Override
-    public Test get(Long id) {
-        return testQueryPersistencePort
-                .findById(id)
-                .orElseThrow(() -> new TestNotFoundException(id));
+    public TestResult get(Long id) {
+        return TestResult.from(testPersistencePort.getOrThrow(id));
     }
 }

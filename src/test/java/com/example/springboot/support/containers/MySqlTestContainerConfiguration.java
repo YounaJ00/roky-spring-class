@@ -16,6 +16,6 @@ public class MySqlTestContainerConfiguration {
                 .withDatabaseName("spring_boot")
                 .withUsername("spring_boot")
                 .withPassword("spring_boot")
-                .withStartupTimeout(Duration.ofMinutes(3));
+                .withStartupTimeout(Duration.ofMinutes(5));
     }
 }
