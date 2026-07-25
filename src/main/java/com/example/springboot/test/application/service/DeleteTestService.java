@@ -1,4 +1,4 @@
-package com.example.springboot.test.application.command;
+package com.example.springboot.test.application.service;
 
 import com.example.springboot.test.application.port.in.DeleteTestUseCase;
 import com.example.springboot.test.application.port.out.TestPersistencePort;

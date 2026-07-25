@@ -1,4 +1,4 @@
-package com.example.springboot.test.application.command;
+package com.example.springboot.test.application.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
