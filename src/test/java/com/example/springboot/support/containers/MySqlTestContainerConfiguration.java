@@ -1,6 +1,7 @@
 package com.example.springboot.support.containers;
 
 import java.time.Duration;
+import java.util.Map;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ public class MySqlTestContainerConfiguration {
                 .withDatabaseName("spring_boot")
                 .withUsername("spring_boot")
                 .withPassword("spring_boot")
+                .withTmpFs(Map.of("/var/lib/mysql", "rw"))
                 .withStartupTimeout(Duration.ofMinutes(3));
     }
 }
