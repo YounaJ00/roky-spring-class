@@ -15,3 +15,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+jwt:
+  secret: ${JWT_SECRET:change-this-to-a-very-long-secret-key-at-least-32-bytes}
+  expiration-seconds: 3600
