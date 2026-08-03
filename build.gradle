@@ -64,6 +64,11 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+
+	testLogging {
+		showStandardStreams = true
+		events 'passed', 'failed', 'skipped'
+	}
 	finalizedBy tasks.named('jacocoTestReport')
 }
 
