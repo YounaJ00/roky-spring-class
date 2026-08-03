@@ -21,4 +21,4 @@ logging:
     org.hibernate.SQL: debug
 jwt:
   secret: ${JWT_SECRET:change-this-to-a-very-long-secret-key-at-least-32-bytes}
-  expiration-seconds: 3600
+  expiration-millis: 3600000
