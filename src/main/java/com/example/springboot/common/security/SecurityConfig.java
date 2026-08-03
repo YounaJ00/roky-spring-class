@@ -115,6 +115,9 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/tests/**")
+                        .permitAll()
+
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/v1/auth/signup",

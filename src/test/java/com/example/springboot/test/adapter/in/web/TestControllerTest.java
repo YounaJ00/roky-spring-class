@@ -19,16 +19,19 @@ import com.example.springboot.test.application.port.in.UpdateTestUseCase;
 import com.example.springboot.test.application.port.in.dto.CreateTestCommand;
 import com.example.springboot.test.application.port.in.dto.TestResult;
 import com.example.springboot.test.application.port.in.dto.UpdateTestCommand;
+import com.example.springboot.user.application.port.out.TokenProviderPort;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(TestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("TestController")
 class TestControllerTest {
 
@@ -46,6 +49,8 @@ class TestControllerTest {
     @MockitoBean private UpdateTestUseCase updateTestUseCase;
 
     @MockitoBean private DeleteTestUseCase deleteTestUseCase;
+
+    @MockitoBean private TokenProviderPort tokenProviderPort;
 
     @org.junit.jupiter.api.Test
     @DisplayName("생성 요청은 201과 생성된 리소스를 반환한다")
