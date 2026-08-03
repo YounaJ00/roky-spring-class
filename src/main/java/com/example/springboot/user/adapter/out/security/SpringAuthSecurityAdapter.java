@@ -14,8 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class SpringAuthSecurityAdapter
-        implements AuthSecurityPort {
+public class SpringAuthSecurityAdapter implements AuthSecurityPort {
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -26,33 +25,19 @@ public class SpringAuthSecurityAdapter
     }
 
     @Override
-    public AuthenticatedUser authenticate(
-            String email,
-            String rawPassword
-    ) {
+    public AuthenticatedUser authenticate(String email, String rawPassword) {
         try {
             Authentication authentication =
                     authenticationManager.authenticate(
-                            UsernamePasswordAuthenticationToken
-                                    .unauthenticated(
-                                            email,
-                                            rawPassword
-                                    )
-                    );
+                            UsernamePasswordAuthenticationToken.unauthenticated(
+                                    email, rawPassword));
 
-            CustomUserPrincipal principal =
-                    (CustomUserPrincipal) authentication.getPrincipal();
+            CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
 
-            return new AuthenticatedUser(
-                    principal.getUserId(),
-                    principal.getEmail()
-            );
+            return new AuthenticatedUser(principal.getUserId(), principal.getEmail());
 
         } catch (AuthenticationException exception) {
-            throw new ApiException(
-                    HttpStatus.UNAUTHORIZED,
-                    "이메일 또는 비밀번호가 올바르지 않습니다."
-            );
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
     }
 }

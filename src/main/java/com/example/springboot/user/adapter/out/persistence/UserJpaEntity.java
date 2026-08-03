@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
         name = "users",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_users_email",
-                columnNames = "email"
-        )
-)
+        uniqueConstraints = @UniqueConstraint(name = "uk_users_email", columnNames = "email"))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserJpaEntity {
 
@@ -28,21 +24,12 @@ public class UserJpaEntity {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    private UserJpaEntity(
-            String email,
-            String passwordHash
-    ) {
+    private UserJpaEntity(String email, String passwordHash) {
         this.email = email;
         this.passwordHash = passwordHash;
     }
 
-    public static UserJpaEntity create(
-            String email,
-            String passwordHash
-    ) {
-        return new UserJpaEntity(
-                email,
-                passwordHash
-        );
+    public static UserJpaEntity create(String email, String passwordHash) {
+        return new UserJpaEntity(email, passwordHash);
     }
 }

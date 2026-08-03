@@ -28,13 +28,7 @@ public class PostJpaEntity {
     @Column(name = "view_count", nullable = false)
     private long viewCount;
 
-    private PostJpaEntity(
-            Long id,
-            Long authorId,
-            String title,
-            String content,
-            long viewCount
-    ) {
+    private PostJpaEntity(Long id, Long authorId, String title, String content, long viewCount) {
         this.id = id;
         this.authorId = authorId;
         this.title = title;
@@ -43,18 +37,7 @@ public class PostJpaEntity {
     }
 
     public static PostJpaEntity of(
-            Long id,
-            Long authorId,
-            String title,
-            String content,
-            long viewCount
-    ) {
-        return new PostJpaEntity(
-                id,
-                authorId,
-                title,
-                content,
-                viewCount
-        );
+            Long id, Long authorId, String title, String content, long viewCount) {
+        return new PostJpaEntity(id, authorId, title, content, viewCount);
     }
 }

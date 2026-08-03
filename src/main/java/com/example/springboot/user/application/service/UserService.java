@@ -23,20 +23,12 @@ public class UserService implements UserUseCase {
     @Transactional
     public UserResult signup(SignupCommand command) {
         if (userRepositoryPort.existsByEmail(command.email())) {
-            throw new ApiException(
-                    HttpStatus.CONFLICT,
-                    "이미 사용 중인 이메일입니다."
-            );
+            throw new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
         }
 
-        String encodedPassword =
-                authSecurityPort.encode(command.password());
+        String encodedPassword = authSecurityPort.encode(command.password());
 
-        User user = User.register(
-                command.email(),
-                command.password(),
-                encodedPassword
-        );
+        User user = User.register(command.email(), command.password(), encodedPassword);
 
         User saved = userRepositoryPort.save(user);
 
@@ -46,16 +38,10 @@ public class UserService implements UserUseCase {
     @Override
     public LoginResult login(LoginCommand command) {
         AuthSecurityPort.AuthenticatedUser authenticated =
-                authSecurityPort.authenticate(
-                        command.email(),
-                        command.password()
-                );
+                authSecurityPort.authenticate(command.email(), command.password());
 
         TokenProviderPort.IssuedToken token =
-                tokenProviderPort.issue(
-                        authenticated.userId(),
-                        authenticated.email()
-                );
+                tokenProviderPort.issue(authenticated.userId(), authenticated.email());
 
         return new LoginResult(token.value(), token.expiresAt());
     }
@@ -63,11 +49,11 @@ public class UserService implements UserUseCase {
     @Override
     @Transactional(readOnly = true)
     public UserResult getMe(Long userId) {
-        User user = userRepositoryPort.findById(userId)
-                .orElseThrow(() -> new ApiException(
-                        HttpStatus.NOT_FOUND,
-                        "사용자를 찾을 수 없습니다."
-                ));
+        User user =
+                userRepositoryPort
+                        .findById(userId)
+                        .orElseThrow(
+                                () -> new ApiException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         return new UserResult(user.getId(), user.getEmail());
     }

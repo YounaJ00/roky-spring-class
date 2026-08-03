@@ -4,38 +4,17 @@ import java.util.List;
 
 public interface PostUseCase {
 
-    PostResult create(
-            Long userId,
-            PostCommand command
-    );
+    PostResult create(Long userId, PostCommand command);
 
     PostResult get(Long postId);
 
     List<PostResult> getAll();
 
-    PostResult update(
-            Long userId,
-            Long postId,
-            PostCommand command
-    );
+    PostResult update(Long userId, Long postId, PostCommand command);
 
-    void delete(
-            Long userId,
-            Long postId
-    );
+    void delete(Long userId, Long postId);
 
-    record PostCommand(
-            String title,
-            String content
-    ) {
-    }
+    record PostCommand(String title, String content) {}
 
-    record PostResult(
-            Long id,
-            Long authorId,
-            String title,
-            String content,
-            long viewCount
-    ) {
-    }
+    record PostResult(Long id, Long authorId, String title, String content, long viewCount) {}
 }

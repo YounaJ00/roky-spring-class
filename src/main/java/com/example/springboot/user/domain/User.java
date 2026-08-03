@@ -1,9 +1,7 @@
 package com.example.springboot.user.domain;
 
-import lombok.Getter;
-
-import java.util.Objects;
 import java.util.regex.Pattern;
+import lombok.Getter;
 
 @Getter
 public class User {
@@ -21,15 +19,17 @@ public class User {
         this.email = email;
         this.encodedPassword = encodedPassword;
     }
+
     // register: 신규 회원 생성, id 없음
-    public static User register(String email, String rawPassword, String encodedPassword){
+    public static User register(String email, String rawPassword, String encodedPassword) {
         if (rawPassword == null || rawPassword.length() < 8) {
             throw new IllegalArgumentException("비밀번호는 8자 이상이어야 합니다.");
         }
         return new User(null, email, encodedPassword);
     }
+
     // 기존 회원 복원, id 있음
-    public static User restore(Long id, String email, String encodedPassword){
+    public static User restore(Long id, String email, String encodedPassword) {
         return new User(id, email, encodedPassword);
     }
 

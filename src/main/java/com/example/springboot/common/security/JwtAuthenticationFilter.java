@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,12 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter
-        extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -28,45 +26,30 @@ public class JwtAuthenticationFilter
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-        String authorization =
-                request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (authorization == null
-                || !authorization.startsWith(BEARER_PREFIX)) {
+        if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
 
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String token = authorization.substring(
-                    BEARER_PREFIX.length()
-            );
+            String token = authorization.substring(BEARER_PREFIX.length());
 
-            TokenProviderPort.TokenClaims claims =
-                    tokenProviderPort.parse(token);
+            TokenProviderPort.TokenClaims claims = tokenProviderPort.parse(token);
 
             CustomUserPrincipal principal =
-                    new CustomUserPrincipal(
-                            claims.userId(),
-                            claims.email(),
-                            null
-                    );
+                    new CustomUserPrincipal(claims.userId(), claims.email(), null);
 
             var authentication =
                     UsernamePasswordAuthenticationToken.authenticated(
-                            principal,
-                            null,
-                            principal.getAuthorities()
-                    );
+                            principal, null, principal.getAuthorities());
 
-            SecurityContext context =
-                    SecurityContextHolder.createEmptyContext();
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
 
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
@@ -74,19 +57,15 @@ public class JwtAuthenticationFilter
         } catch (JwtException | IllegalArgumentException exception) {
             SecurityContextHolder.clearContext();
 
-            response.setStatus(
-                    HttpStatus.UNAUTHORIZED.value()
-            );
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
-            response.setContentType(
-                    "application/json;charset=UTF-8"
-            );
+            response.setContentType("application/json;charset=UTF-8");
 
-            response.getWriter().write(
-                    """
+            response.getWriter()
+                    .write(
+                            """
                     {"status":401,"error":"UNAUTHORIZED","message":"유효하지 않은 토큰입니다."}
-                    """
-            );
+                    """);
 
             return;
         }

@@ -9,12 +9,11 @@ public interface UserUseCase {
 
     UserResult getMe(Long userId);
 
-    record SignupCommand(String email, String password){}
+    record SignupCommand(String email, String password) {}
 
-    record LoginCommand(String email, String password){}
+    record LoginCommand(String email, String password) {}
 
-    record UserResult(Long id, String email){}
+    record UserResult(Long id, String email) {}
 
-    record LoginResult(String accessToken, Instant expiresAt){}
+    record LoginResult(String accessToken, Instant expiresAt) {}
 }
-

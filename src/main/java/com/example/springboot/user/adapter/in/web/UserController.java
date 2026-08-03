@@ -20,43 +20,22 @@ public class UserController {
     private final UserUseCase userUseCase;
 
     @PostMapping("/api/v1/auth/signup")
-    public UserUseCase.UserResult signup(
-            @Valid @RequestBody SignupRequest request
-    ) {
+    public UserUseCase.UserResult signup(@Valid @RequestBody SignupRequest request) {
         return userUseCase.signup(
-                new UserUseCase.SignupCommand(
-                        request.email(),
-                        request.password()
-                )
-        );
+                new UserUseCase.SignupCommand(request.email(), request.password()));
     }
 
     @PostMapping("/api/v1/auth/login")
-    public UserUseCase.LoginResult login(
-            @Valid @RequestBody LoginRequest request
-    ) {
-        return userUseCase.login(
-                new UserUseCase.LoginCommand(
-                        request.email(),
-                        request.password()
-                )
-        );
+    public UserUseCase.LoginResult login(@Valid @RequestBody LoginRequest request) {
+        return userUseCase.login(new UserUseCase.LoginCommand(request.email(), request.password()));
     }
 
     @GetMapping("/api/v1/users/me")
-    public UserUseCase.UserResult getMe(
-            @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
+    public UserUseCase.UserResult getMe(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return userUseCase.getMe(principal.getUserId());
     }
 
-    public record SignupRequest(
-            @Email String email,
-            @Size(min = 8) String password
-    ) {}
+    public record SignupRequest(@Email String email, @Size(min = 8) String password) {}
 
-    public record LoginRequest(
-            @Email String email,
-            @NotBlank String password
-    ) {}
+    public record LoginRequest(@Email String email, @NotBlank String password) {}
 }

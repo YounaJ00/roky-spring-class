@@ -4,12 +4,11 @@ import com.example.springboot.common.security.CustomUserPrincipal;
 import com.example.springboot.post.application.port.in.PostUseCase;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,23 +20,13 @@ public class PostController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PostUseCase.PostResult create(
-            @AuthenticationPrincipal
-            CustomUserPrincipal principal,
-
-            @Valid
-            @RequestBody
-            PostRequest request
-    ) {
-        return postUseCase.create(
-                principal.getUserId(),
-                request.toCommand()
-        );
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @Valid @RequestBody PostRequest request) {
+        return postUseCase.create(principal.getUserId(), request.toCommand());
     }
 
     @GetMapping("/{postId}")
-    public PostUseCase.PostResult get(
-            @PathVariable Long postId
-    ) {
+    public PostUseCase.PostResult get(@PathVariable Long postId) {
         return postUseCase.get(postId);
     }
 
@@ -48,47 +37,23 @@ public class PostController {
 
     @PatchMapping("/{postId}")
     public PostUseCase.PostResult update(
-            @AuthenticationPrincipal
-            CustomUserPrincipal principal,
-
-            @PathVariable
-            Long postId,
-
-            @Valid
-            @RequestBody
-            PostRequest request
-    ) {
-        return postUseCase.update(
-                principal.getUserId(),
-                postId,
-                request.toCommand()
-        );
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @PathVariable Long postId,
+            @Valid @RequestBody PostRequest request) {
+        return postUseCase.update(principal.getUserId(), postId, request.toCommand());
     }
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
-            @AuthenticationPrincipal
-            CustomUserPrincipal principal,
+            @AuthenticationPrincipal CustomUserPrincipal principal, @PathVariable Long postId) {
 
-            @PathVariable
-            Long postId
-    ) {
-        postUseCase.delete(
-                principal.getUserId(),
-                postId
-        );
+        postUseCase.delete(principal.getUserId(), postId);
     }
 
-    public record PostRequest(
-            @NotBlank String title,
-            @NotBlank String content
-    ) {
+    public record PostRequest(@NotBlank String title, @NotBlank String content) {
         private PostUseCase.PostCommand toCommand() {
-            return new PostUseCase.PostCommand(
-                    title,
-                    content
-            );
+            return new PostUseCase.PostCommand(title, content);
         }
     }
 }

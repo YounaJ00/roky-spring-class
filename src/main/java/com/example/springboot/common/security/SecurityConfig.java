@@ -31,30 +31,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService userDetailsService(
-            UserRepositoryPort userRepositoryPort
-    ) {
+    UserDetailsService userDetailsService(UserRepositoryPort userRepositoryPort) {
         return email -> {
-            User user = userRepositoryPort.findByEmail(email)
-                    .orElseThrow(
-                            () -> new UsernameNotFoundException(email)
-                    );
+            User user =
+                    userRepositoryPort
+                            .findByEmail(email)
+                            .orElseThrow(() -> new UsernameNotFoundException(email));
 
             return new CustomUserPrincipal(
-                    user.getId(),
-                    user.getEmail(),
-                    user.getEncodedPassword()
-            );
+                    user.getId(), user.getEmail(), user.getEncodedPassword());
         };
     }
 
     @Bean
     DaoAuthenticationProvider authenticationProvider(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
-        DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider(userDetailsService);
+            UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
 
         provider.setPasswordEncoder(passwordEncoder);
 
@@ -62,83 +54,59 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager(
-            DaoAuthenticationProvider provider
-    ) {
+    AuthenticationManager authenticationManager(DaoAuthenticationProvider provider) {
         return new ProviderManager(provider);
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+        return http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
-
-                .exceptionHandling(handler -> handler
-                        .authenticationEntryPoint(
-                                (request, response, exception) -> {
-                                    response.setStatus(401);
-                                    response.setContentType(
-                                            "application/json;charset=UTF-8"
-                                    );
-                                    response.getWriter().write(
-                                            """
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(
+                        handler ->
+                                handler.authenticationEntryPoint(
+                                                (request, response, exception) -> {
+                                                    response.setStatus(401);
+                                                    response.setContentType(
+                                                            "application/json;charset=UTF-8");
+                                                    response.getWriter()
+                                                            .write(
+                                                                    """
                                             {"status":401,"error":"UNAUTHORIZED","message":"인증이 필요합니다."}
-                                            """
-                                    );
-                                }
-                        )
-                        .accessDeniedHandler(
-                                (request, response, exception) -> {
-                                    response.setStatus(403);
-                                    response.setContentType(
-                                            "application/json;charset=UTF-8"
-                                    );
-                                    response.getWriter().write(
-                                            """
+                                            """);
+                                                })
+                                        .accessDeniedHandler(
+                                                (request, response, exception) -> {
+                                                    response.setStatus(403);
+                                                    response.setContentType(
+                                                            "application/json;charset=UTF-8");
+                                                    response.getWriter()
+                                                            .write(
+                                                                    """
                                             {"status":403,"error":"FORBIDDEN","message":"접근 권한이 없습니다."}
-                                            """
-                                    );
-                                }
-                        )
-                )
-
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/tests/**")
-                        .permitAll()
-
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/v1/auth/signup",
-                                "/api/v1/auth/login"
-                        ).permitAll()
-
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/v1/posts",
-                                "/api/v1/posts/**"
-                        ).permitAll()
-
-                        .anyRequest()
-                        .authenticated()
-                )
-
+                                            """);
+                                                }))
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers("/api/tests/**")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                HttpMethod.POST,
+                                                "/api/v1/auth/signup",
+                                                "/api/v1/auth/login")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                HttpMethod.GET, "/api/v1/posts", "/api/v1/posts/**")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
                 .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
-
+                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
