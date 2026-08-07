@@ -74,8 +74,8 @@ docker compose up -d mysql
 
 | 기능 | Method | Path | 인증 | 성공 상태 |
 | --- | --- | --- | --- | --- |
-| 회원가입 | `POST` | `/api/v1/auth/signup` | 불필요 | `200 OK` |
-| 로그인 | `POST` | `/api/v1/auth/login` | 불필요 | `200 OK` |
+| 회원가입 | `POST` | `/open-api/v1/auth/signup` | 불필요 | `200 OK` |
+| 로그인 | `POST` | `/open-api/v1/auth/login` | 불필요 | `200 OK` |
 | 내 정보 조회 | `GET` | `/api/v1/users/me` | Bearer Token | `200 OK` |
 
 회원가입 요청:
@@ -125,8 +125,8 @@ Authorization: Bearer {accessToken}
 | 기능 | Method | Path | 인증 | 성공 상태 |
 | --- | --- | --- | --- | --- |
 | 게시물 작성 | `POST` | `/api/v1/posts` | 필요 | `201 Created` |
-| 단건 조회·조회수 증가 | `GET` | `/api/v1/posts/{id}` | 불필요 | `200 OK` |
-| 목록 조회 | `GET` | `/api/v1/posts` | 불필요 | `200 OK` |
+| 단건 조회·조회수 증가 | `GET` | `/open-api/v1/posts/{id}` | 불필요 | `200 OK` |
+| 목록 조회 | `GET` | `/open-api/v1/posts` | 불필요 | `200 OK` |
 | 게시물 수정 | `PATCH` | `/api/v1/posts/{id}` | 작성자 | `200 OK` |
 | 게시물 삭제 | `DELETE` | `/api/v1/posts/{id}` | 작성자 | `204 No Content` |
 

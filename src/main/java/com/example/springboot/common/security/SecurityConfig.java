@@ -5,7 +5,6 @@ import com.example.springboot.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -93,15 +92,7 @@ public class SecurityConfig {
                                                 }))
                 .authorizeHttpRequests(
                         auth ->
-                                auth.requestMatchers("/api/tests/**")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                HttpMethod.POST,
-                                                "/api/v1/auth/signup",
-                                                "/api/v1/auth/login")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                HttpMethod.GET, "/api/v1/posts", "/api/v1/posts/**")
+                                auth.requestMatchers("/open-api/**")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())

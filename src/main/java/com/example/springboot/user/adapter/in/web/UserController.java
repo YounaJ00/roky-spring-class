@@ -19,13 +19,13 @@ public class UserController {
 
     private final UserUseCase userUseCase;
 
-    @PostMapping("/api/v1/auth/signup")
+    @PostMapping("/open-api/v1/auth/signup")
     public UserUseCase.UserResult signup(@Valid @RequestBody SignupRequest request) {
         return userUseCase.signup(
                 new UserUseCase.SignupCommand(request.email(), request.password()));
     }
 
-    @PostMapping("/api/v1/auth/login")
+    @PostMapping("/open-api/v1/auth/login")
     public UserUseCase.LoginResult login(@Valid @RequestBody LoginRequest request) {
         return userUseCase.login(new UserUseCase.LoginCommand(request.email(), request.password()));
     }

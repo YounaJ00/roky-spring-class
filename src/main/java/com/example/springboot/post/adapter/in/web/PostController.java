@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/posts")
 public class PostController {
 
     private final PostUseCase postUseCase;
 
-    @PostMapping
+    @PostMapping("/api/v1/posts")
     @ResponseStatus(HttpStatus.CREATED)
     public PostUseCase.PostResult create(
             @AuthenticationPrincipal CustomUserPrincipal principal,
@@ -25,17 +24,17 @@ public class PostController {
         return postUseCase.create(principal.getUserId(), request.toCommand());
     }
 
-    @GetMapping("/{postId}")
+    @GetMapping("/open-api/v1/posts/{postId}")
     public PostUseCase.PostResult get(@PathVariable Long postId) {
         return postUseCase.get(postId);
     }
 
-    @GetMapping
+    @GetMapping("/open-api/v1/posts")
     public List<PostUseCase.PostResult> getAll() {
         return postUseCase.getAll();
     }
 
-    @PatchMapping("/{postId}")
+    @PatchMapping("/api/v1/posts/{postId}")
     public PostUseCase.PostResult update(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable Long postId,
@@ -43,7 +42,7 @@ public class PostController {
         return postUseCase.update(principal.getUserId(), postId, request.toCommand());
     }
 
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/api/v1/posts/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
             @AuthenticationPrincipal CustomUserPrincipal principal, @PathVariable Long postId) {
