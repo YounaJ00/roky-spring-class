@@ -1,9 +1,10 @@
 package com.example.springboot.post.adapter.in.web;
 
 import com.example.springboot.common.security.CustomUserPrincipal;
+import com.example.springboot.post.adapter.in.web.dto.PostRequest;
+import com.example.springboot.post.adapter.in.web.dto.PostResponse;
 import com.example.springboot.post.application.port.in.PostUseCase;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,28 +19,30 @@ public class PostController {
 
     @PostMapping("/api/v1/posts")
     @ResponseStatus(HttpStatus.CREATED)
-    public PostUseCase.PostResult create(
+    public PostResponse create(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @Valid @RequestBody PostRequest request) {
-        return postUseCase.create(principal.getUserId(), request.toCommand());
+        return PostMapper.toResponse(
+                postUseCase.create(principal.getUserId(), PostMapper.toCommand(request)));
     }
 
     @GetMapping("/open-api/v1/posts/{postId}")
-    public PostUseCase.PostResult get(@PathVariable Long postId) {
-        return postUseCase.get(postId);
+    public PostResponse get(@PathVariable Long postId) {
+        return PostMapper.toResponse(postUseCase.get(postId));
     }
 
     @GetMapping("/open-api/v1/posts")
-    public List<PostUseCase.PostResult> getAll() {
-        return postUseCase.getAll();
+    public List<PostResponse> getAll() {
+        return PostMapper.toResponses(postUseCase.getAll());
     }
 
     @PatchMapping("/api/v1/posts/{postId}")
-    public PostUseCase.PostResult update(
+    public PostResponse update(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable Long postId,
             @Valid @RequestBody PostRequest request) {
-        return postUseCase.update(principal.getUserId(), postId, request.toCommand());
+        return PostMapper.toResponse(
+                postUseCase.update(principal.getUserId(), postId, PostMapper.toCommand(request)));
     }
 
     @DeleteMapping("/api/v1/posts/{postId}")
@@ -48,11 +51,5 @@ public class PostController {
             @AuthenticationPrincipal CustomUserPrincipal principal, @PathVariable Long postId) {
 
         postUseCase.delete(principal.getUserId(), postId);
-    }
-
-    public record PostRequest(@NotBlank String title, @NotBlank String content) {
-        private PostUseCase.PostCommand toCommand() {
-            return new PostUseCase.PostCommand(title, content);
-        }
     }
 }
