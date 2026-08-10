@@ -1,6 +1,8 @@
 package com.example.springboot.user.adapter.out.security;
 
 import com.example.springboot.user.application.port.out.TokenProviderPort;
+import com.example.springboot.user.application.port.out.dto.IssuedToken;
+import com.example.springboot.user.application.port.out.dto.TokenClaims;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

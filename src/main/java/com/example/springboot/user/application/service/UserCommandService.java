@@ -10,6 +10,7 @@ import com.example.springboot.user.application.port.out.AuthSecurityPort;
 import com.example.springboot.user.application.port.out.TokenProviderPort;
 import com.example.springboot.user.application.port.out.UserCommandPort;
 import com.example.springboot.user.application.port.out.dto.AuthenticatedUser;
+import com.example.springboot.user.application.port.out.dto.IssuedToken;
 import com.example.springboot.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,8 +46,7 @@ public class UserCommandService implements UserCommandUseCase {
         AuthenticatedUser authenticated =
                 authSecurityPort.authenticate(command.email(), command.password());
 
-        TokenProviderPort.IssuedToken token =
-                tokenProviderPort.issue(authenticated.userId(), authenticated.email());
+        IssuedToken token = tokenProviderPort.issue(authenticated.userId(), authenticated.email());
 
         return new LoginResult(token.value(), token.expiresAt());
     }

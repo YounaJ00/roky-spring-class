@@ -1,6 +1,7 @@
 package com.example.springboot.common.security;
 
 import com.example.springboot.user.application.port.out.TokenProviderPort;
+import com.example.springboot.user.application.port.out.dto.TokenClaims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = authorization.substring(BEARER_PREFIX.length());
 
-            TokenProviderPort.TokenClaims claims = tokenProviderPort.parse(token);
+            TokenClaims claims = tokenProviderPort.parse(token);
 
             CustomUserPrincipal principal =
                     new CustomUserPrincipal(claims.userId(), claims.email(), null);
