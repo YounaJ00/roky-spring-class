@@ -1,0 +1,23 @@
+ALTER TABLE users
+    ADD COLUMN created_at DATETIME(6) NULL,
+    ADD COLUMN updated_at DATETIME(6) NULL;
+
+UPDATE users
+SET created_at = CURRENT_TIMESTAMP(6),
+    updated_at = CURRENT_TIMESTAMP(6);
+
+ALTER TABLE users
+    MODIFY COLUMN created_at DATETIME(6) NOT NULL,
+    MODIFY COLUMN updated_at DATETIME(6) NOT NULL;
+
+ALTER TABLE posts
+    ADD COLUMN created_at DATETIME(6) NULL,
+    ADD COLUMN updated_at DATETIME(6) NULL;
+
+UPDATE posts
+SET created_at = CURRENT_TIMESTAMP(6),
+    updated_at = CURRENT_TIMESTAMP(6);
+
+ALTER TABLE posts
+    MODIFY COLUMN created_at DATETIME(6) NOT NULL,
+    MODIFY COLUMN updated_at DATETIME(6) NOT NULL;

@@ -2,11 +2,16 @@ package com.example.springboot.post.adapter.out.persistence;
 
 import com.example.springboot.post.domain.Post;
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "posts")
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostJpaEntity {
 
@@ -26,6 +31,14 @@ public class PostJpaEntity {
 
     @Column(name = "view_count", nullable = false)
     private long viewCount;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
     private PostJpaEntity(Long id, Long authorId, String title, String content, long viewCount) {
         this.id = id;
