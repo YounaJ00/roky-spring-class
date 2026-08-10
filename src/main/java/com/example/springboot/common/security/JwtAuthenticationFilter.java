@@ -10,10 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final TokenProviderPort tokenProviderPort;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(
@@ -57,17 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (JwtException | IllegalArgumentException exception) {
             SecurityContextHolder.clearContext();
-
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-
-            response.setContentType("application/json;charset=UTF-8");
-
-            response.getWriter()
-                    .write(
-                            """
-                    {"status":401,"error":"UNAUTHORIZED","message":"유효하지 않은 토큰입니다."}
-                    """);
-
+            authenticationEntryPoint.commence(
+                    request, response, new BadCredentialsException("유효하지 않은 토큰입니다.", exception));
             return;
         }
 

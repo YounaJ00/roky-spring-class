@@ -22,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.getWriter()
                 .write(
                         """
-                {"status":401,"error":"UNAUTHORIZED","message":"인증이 필요합니다."}
+                {"status":401,"error":"UNAUTHORIZED","message":"인증에 실패했습니다."}
                 """);
     }
 }
