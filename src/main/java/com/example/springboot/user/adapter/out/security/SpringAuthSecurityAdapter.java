@@ -32,7 +32,9 @@ public class SpringAuthSecurityAdapter implements AuthSecurityPort {
                             UsernamePasswordAuthenticationToken.unauthenticated(
                                     email, rawPassword));
 
-            CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
+            if (!(authentication.getPrincipal() instanceof CustomUserPrincipal principal)) {
+                throw new ApiException(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다.");
+            }
 
             return new AuthenticatedUser(principal.getUserId(), principal.getEmail());
 
