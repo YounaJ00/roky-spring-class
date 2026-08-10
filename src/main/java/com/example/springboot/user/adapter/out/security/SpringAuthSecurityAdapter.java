@@ -3,6 +3,7 @@ package com.example.springboot.user.adapter.out.security;
 import com.example.springboot.common.exception.ApiException;
 import com.example.springboot.common.security.CustomUserPrincipal;
 import com.example.springboot.user.application.port.out.AuthSecurityPort;
+import com.example.springboot.user.application.port.out.dto.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;

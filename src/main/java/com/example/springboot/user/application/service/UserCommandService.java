@@ -9,6 +9,7 @@ import com.example.springboot.user.application.port.in.dto.UserResult;
 import com.example.springboot.user.application.port.out.AuthSecurityPort;
 import com.example.springboot.user.application.port.out.TokenProviderPort;
 import com.example.springboot.user.application.port.out.UserCommandPort;
+import com.example.springboot.user.application.port.out.dto.AuthenticatedUser;
 import com.example.springboot.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class UserCommandService implements UserCommandUseCase {
 
     @Override
     public LoginResult login(LoginCommand command) {
-        AuthSecurityPort.AuthenticatedUser authenticated =
+        AuthenticatedUser authenticated =
                 authSecurityPort.authenticate(command.email(), command.password());
 
         TokenProviderPort.IssuedToken token =
