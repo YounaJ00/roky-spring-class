@@ -1,6 +1,9 @@
 package com.example.springboot.user.application.port.in;
 
-import java.time.Instant;
+import com.example.springboot.user.application.port.in.dto.LoginCommand;
+import com.example.springboot.user.application.port.in.dto.LoginResult;
+import com.example.springboot.user.application.port.in.dto.SignupCommand;
+import com.example.springboot.user.application.port.in.dto.UserResult;
 
 public interface UserUseCase {
     UserResult signup(SignupCommand command);
@@ -8,12 +11,4 @@ public interface UserUseCase {
     LoginResult login(LoginCommand command);
 
     UserResult getMe(Long userId);
-
-    record SignupCommand(String email, String password) {}
-
-    record LoginCommand(String email, String password) {}
-
-    record UserResult(Long id, String email) {}
-
-    record LoginResult(String accessToken, Instant expiresAt) {}
 }
