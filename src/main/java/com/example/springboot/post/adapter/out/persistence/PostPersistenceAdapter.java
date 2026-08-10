@@ -1,6 +1,7 @@
 package com.example.springboot.post.adapter.out.persistence;
 
-import com.example.springboot.post.application.port.out.PostRepositoryPort;
+import com.example.springboot.post.application.port.out.PostCommandPort;
+import com.example.springboot.post.application.port.out.PostQueryPort;
 import com.example.springboot.post.domain.Post;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PostPersistenceAdapter implements PostRepositoryPort {
+public class PostPersistenceAdapter implements PostCommandPort, PostQueryPort {
 
     private final PostJpaRepository repository;
 

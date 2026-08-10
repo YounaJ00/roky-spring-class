@@ -1,52 +1,43 @@
 package com.example.springboot.post.application.service;
 
 import com.example.springboot.common.exception.ApiException;
-import com.example.springboot.post.application.port.in.PostUseCase;
-import com.example.springboot.post.application.port.out.PostRepositoryPort;
+import com.example.springboot.post.application.port.in.PostCommandUseCase;
+import com.example.springboot.post.application.port.in.dto.PostCommand;
+import com.example.springboot.post.application.port.in.dto.PostResult;
+import com.example.springboot.post.application.port.out.PostCommandPort;
 import com.example.springboot.post.domain.Post;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
-public class PostService implements PostUseCase {
+public class PostCommandService implements PostCommandUseCase {
 
-    private final PostRepositoryPort postRepositoryPort;
+    private final PostCommandPort postCommandPort;
 
     @Override
-    @Transactional
     public PostResult create(Long userId, PostCommand command) {
-        Post saved =
-                postRepositoryPort.save(Post.create(userId, command.title(), command.content()));
-
-        return toResult(saved);
+        return PostResult.from(
+                postCommandPort.save(Post.create(userId, command.title(), command.content())));
     }
 
     @Override
-    @Transactional
     public PostResult get(Long postId) {
         Post post =
-                postRepositoryPort
+                postCommandPort
                         .findByIdForUpdate(postId)
                         .orElseThrow(
                                 () -> new ApiException(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."));
 
         post.increaseViewCount();
 
-        return toResult(postRepositoryPort.save(post));
+        return PostResult.from(postCommandPort.save(post));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<PostResult> getAll() {
-        return postRepositoryPort.findAll().stream().map(this::toResult).toList();
-    }
-
-    @Override
-    @Transactional
     public PostResult update(Long userId, Long postId, PostCommand command) {
         Post post = findPost(postId);
 
@@ -54,21 +45,20 @@ public class PostService implements PostUseCase {
 
         post.update(command.title(), command.content());
 
-        return toResult(postRepositoryPort.save(post));
+        return PostResult.from(postCommandPort.save(post));
     }
 
     @Override
-    @Transactional
     public void delete(Long userId, Long postId) {
         Post post = findPost(postId);
 
         validateAuthor(post, userId);
 
-        postRepositoryPort.deleteById(postId);
+        postCommandPort.deleteById(postId);
     }
 
     private Post findPost(Long postId) {
-        return postRepositoryPort
+        return postCommandPort
                 .findById(postId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."));
     }
@@ -77,14 +67,5 @@ public class PostService implements PostUseCase {
         if (!post.getAuthorId().equals(userId)) {
             throw new ApiException(HttpStatus.FORBIDDEN, "작성자만 변경할 수 있습니다.");
         }
-    }
-
-    private PostResult toResult(Post post) {
-        return new PostResult(
-                post.getId(),
-                post.getAuthorId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getViewCount());
     }
 }

@@ -191,9 +191,9 @@ com.example.springboot
 └── post
     ├── domain                    # Post 도메인
     ├── application
-    │   ├── port.in               # PostUseCase
-    │   ├── port.out              # PostRepositoryPort
-    │   └── service               # CRUD 및 조회수 증가 트랜잭션
+    │   ├── port.in               # PostCommandUseCase, PostQueryUseCase
+    │   ├── port.out              # PostCommandPort, PostQueryPort
+    │   └── service               # 명령·조회 유스케이스와 트랜잭션 경계
     └── adapter
         ├── in.web                # 게시물 HTTP 어댑터
         └── out.persistence       # JPA Entity/Repository/Mapper

@@ -2,8 +2,8 @@ package com.example.springboot.post;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.springboot.post.application.port.out.PostRepositoryPort;
-import com.example.springboot.post.application.service.PostService;
+import com.example.springboot.post.application.port.out.PostCommandPort;
+import com.example.springboot.post.application.service.PostCommandService;
 import com.example.springboot.post.domain.Post;
 import com.example.springboot.support.containers.MySqlTestContainerConfiguration;
 import com.example.springboot.user.application.port.out.UserRepositoryPort;
@@ -32,9 +32,9 @@ class PostConcurrencyTest {
 
     private static final int THREAD_COUNT = 100;
 
-    @Autowired private PostRepositoryPort postRepositoryPort;
+    @Autowired private PostCommandPort postCommandPort;
 
-    @Autowired private PostService postService;
+    @Autowired private PostCommandService postCommandService;
 
     @Autowired private UserRepositoryPort userRepositoryPort;
 
@@ -55,7 +55,7 @@ class PostConcurrencyTest {
                                                         "password123",
                                                         "encoded-password")));
 
-        Post saved = postRepositoryPort.save(Post.create(author.getId(), "동시성 테스트", "테스트 내용"));
+        Post saved = postCommandPort.save(Post.create(author.getId(), "동시성 테스트", "테스트 내용"));
 
         postId = saved.getId();
     }
@@ -67,7 +67,7 @@ class PostConcurrencyTest {
 
         runConcurrent(() -> lostUpdateWorker.increase(postId, allRead));
 
-        long viewCount = postRepositoryPort.findById(postId).orElseThrow().getViewCount();
+        long viewCount = postCommandPort.findById(postId).orElseThrow().getViewCount();
 
         System.out.println("[락 없음] 최종 조회수 = " + viewCount);
 
@@ -78,9 +78,9 @@ class PostConcurrencyTest {
     @DisplayName("비관적 락 적용 후 조회수 100이 보장된다")
     void pessimisticLockPreventsLostUpdate() throws Exception {
 
-        runConcurrent(() -> postService.get(postId));
+        runConcurrent(() -> postCommandService.get(postId));
 
-        long viewCount = postRepositoryPort.findById(postId).orElseThrow().getViewCount();
+        long viewCount = postCommandPort.findById(postId).orElseThrow().getViewCount();
 
         System.out.println("[비관적 락] 최종 조회수 = " + viewCount);
 
@@ -139,22 +139,22 @@ class PostConcurrencyTest {
     static class TestConfig {
 
         @Bean
-        LostUpdateWorker lostUpdateWorker(PostRepositoryPort postRepositoryPort) {
-            return new LostUpdateWorker(postRepositoryPort);
+        LostUpdateWorker lostUpdateWorker(PostCommandPort postCommandPort) {
+            return new LostUpdateWorker(postCommandPort);
         }
     }
 
     static class LostUpdateWorker {
 
-        private final PostRepositoryPort postRepositoryPort;
+        private final PostCommandPort postCommandPort;
 
-        LostUpdateWorker(PostRepositoryPort postRepositoryPort) {
-            this.postRepositoryPort = postRepositoryPort;
+        LostUpdateWorker(PostCommandPort postCommandPort) {
+            this.postCommandPort = postCommandPort;
         }
 
         @Transactional(propagation = Propagation.REQUIRES_NEW)
         public void increase(Long postId, CountDownLatch allRead) {
-            Post post = postRepositoryPort.findById(postId).orElseThrow();
+            Post post = postCommandPort.findById(postId).orElseThrow();
 
             allRead.countDown();
 
@@ -169,7 +169,7 @@ class PostConcurrencyTest {
 
             post.increaseViewCount();
 
-            postRepositoryPort.save(post);
+            postCommandPort.save(post);
         }
     }
 }
