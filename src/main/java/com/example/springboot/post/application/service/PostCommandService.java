@@ -6,6 +6,7 @@ import com.example.springboot.post.application.port.in.dto.PostCommand;
 import com.example.springboot.post.application.port.in.dto.PostResult;
 import com.example.springboot.post.application.port.out.PostCommandPort;
 import com.example.springboot.post.domain.Post;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public PostResult get(Long postId) {
+    public PostResult get(UUID postId) {
         Post post =
                 postCommandPort
                         .findByIdForUpdate(postId)
@@ -38,7 +39,7 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public PostResult update(Long userId, Long postId, PostCommand command) {
+    public PostResult update(Long userId, UUID postId, PostCommand command) {
         Post post = findPost(postId);
 
         validateAuthor(post, userId);
@@ -49,7 +50,7 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public void delete(Long userId, Long postId) {
+    public void delete(Long userId, UUID postId) {
         Post post = findPost(postId);
 
         validateAuthor(post, userId);
@@ -57,7 +58,7 @@ public class PostCommandService implements PostCommandUseCase {
         postCommandPort.deleteById(postId);
     }
 
-    private Post findPost(Long postId) {
+    private Post findPost(UUID postId) {
         return postCommandPort
                 .findById(postId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."));

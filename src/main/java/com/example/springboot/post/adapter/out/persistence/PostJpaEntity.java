@@ -3,8 +3,10 @@ package com.example.springboot.post.adapter.out.persistence;
 import com.example.springboot.post.domain.Post;
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,9 +18,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class PostJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
-    private Long id;
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+    @Column(name = "post_id", nullable = false, updatable = false)
+    private UUID id;
 
     @Column(name = "author_id", nullable = false)
     private Long authorId;
@@ -40,21 +42,16 @@ public class PostJpaEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    private PostJpaEntity(Long id, Long authorId, String title, String content, long viewCount) {
-        this.id = id;
-        this.authorId = authorId;
-        this.title = title;
-        this.content = content;
-        this.viewCount = viewCount;
+    private PostJpaEntity(Post post) {
+        this.id = post.getId();
+        this.authorId = post.getAuthorId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.viewCount = post.getViewCount();
     }
 
     static PostJpaEntity from(Post post) {
-        return new PostJpaEntity(
-                post.getId(),
-                post.getAuthorId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getViewCount());
+        return new PostJpaEntity(post);
     }
 
     Post toDomain() {

@@ -7,6 +7,7 @@ import com.example.springboot.post.application.port.in.PostCommandUseCase;
 import com.example.springboot.post.application.port.in.PostQueryUseCase;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,7 +30,7 @@ public class PostController {
     }
 
     @GetMapping("/open-api/v1/posts/{postId}")
-    public PostResponse get(@PathVariable Long postId) {
+    public PostResponse get(@PathVariable UUID postId) {
         return PostMapper.toResponse(postCommandUseCase.get(postId));
     }
 
@@ -41,7 +42,7 @@ public class PostController {
     @PatchMapping("/api/v1/posts/{postId}")
     public PostResponse update(
             @AuthenticationPrincipal CustomUserPrincipal principal,
-            @PathVariable Long postId,
+            @PathVariable UUID postId,
             @Valid @RequestBody PostRequest request) {
         return PostMapper.toResponse(
                 postCommandUseCase.update(
@@ -51,7 +52,7 @@ public class PostController {
     @DeleteMapping("/api/v1/posts/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
-            @AuthenticationPrincipal CustomUserPrincipal principal, @PathVariable Long postId) {
+            @AuthenticationPrincipal CustomUserPrincipal principal, @PathVariable UUID postId) {
 
         postCommandUseCase.delete(principal.getUserId(), postId);
     }

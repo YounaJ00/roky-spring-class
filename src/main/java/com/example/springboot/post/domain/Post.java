@@ -1,18 +1,19 @@
 package com.example.springboot.post.domain;
 
+import java.util.UUID;
 import lombok.Getter;
 
 @Getter
 public class Post {
 
-    private final Long id;
+    private final UUID id;
     private final Long authorId;
 
     private String title;
     private String content;
     private long viewCount;
 
-    private Post(Long id, Long authorId, String title, String content, long viewCount) {
+    private Post(UUID id, Long authorId, String title, String content, long viewCount) {
         this.id = id;
         this.authorId = authorId;
         this.title = title;
@@ -25,7 +26,7 @@ public class Post {
     }
 
     public static Post restore(
-            Long id, Long authorId, String title, String content, long viewCount) {
+            UUID id, Long authorId, String title, String content, long viewCount) {
         return new Post(id, authorId, title, content, viewCount);
     }
 

@@ -2,14 +2,15 @@ package com.example.springboot.post.application.port.in;
 
 import com.example.springboot.post.application.port.in.dto.PostCommand;
 import com.example.springboot.post.application.port.in.dto.PostResult;
+import java.util.UUID;
 
 public interface PostCommandUseCase {
 
     PostResult create(Long userId, PostCommand command);
 
-    PostResult get(Long postId);
+    PostResult get(UUID postId);
 
-    PostResult update(Long userId, Long postId, PostCommand command);
+    PostResult update(Long userId, UUID postId, PostCommand command);
 
-    void delete(Long userId, Long postId);
+    void delete(Long userId, UUID postId);
 }

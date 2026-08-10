@@ -5,6 +5,7 @@ import com.example.springboot.post.application.port.out.PostQueryPort;
 import com.example.springboot.post.domain.Post;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,22 +21,24 @@ public class PostPersistenceAdapter implements PostCommandPort, PostQueryPort {
     }
 
     @Override
-    public Optional<Post> findById(Long postId) {
+    public Optional<Post> findById(UUID postId) {
         return repository.findById(postId).map(PostJpaEntity::toDomain);
     }
 
     @Override
-    public Optional<Post> findByIdForUpdate(Long postId) {
+    public Optional<Post> findByIdForUpdate(UUID postId) {
         return repository.findByIdForUpdate(postId).map(PostJpaEntity::toDomain);
     }
 
     @Override
     public List<Post> findAll() {
-        return repository.findAllByOrderByIdDesc().stream().map(PostJpaEntity::toDomain).toList();
+        return repository.findAllByOrderByCreatedAtDesc().stream()
+                .map(PostJpaEntity::toDomain)
+                .toList();
     }
 
     @Override
-    public void deleteById(Long postId) {
+    public void deleteById(UUID postId) {
         repository.deleteById(postId);
     }
 }

@@ -11,6 +11,7 @@ import com.example.springboot.user.application.port.out.UserQueryPort;
 import com.example.springboot.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +44,7 @@ class PostConcurrencyTest {
 
     @Autowired private LostUpdateWorker lostUpdateWorker;
 
-    private Long postId;
+    private UUID postId;
 
     @BeforeEach
     void setUp() {
@@ -156,7 +157,7 @@ class PostConcurrencyTest {
         }
 
         @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void increase(Long postId, CountDownLatch allRead) {
+        public void increase(UUID postId, CountDownLatch allRead) {
             Post post = postCommandPort.findById(postId).orElseThrow();
 
             allRead.countDown();

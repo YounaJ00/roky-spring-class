@@ -17,6 +17,7 @@ import com.example.springboot.post.application.port.in.PostQueryUseCase;
 import com.example.springboot.post.application.port.in.dto.PostResult;
 import com.example.springboot.user.application.port.out.TokenProviderPort;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import org.springframework.test.web.servlet.MockMvc;
 })
 @DisplayName("게시글 API 보안 경로")
 class PostSecurityTest {
+
+    private static final UUID POST_ID = UUID.fromString("0198a123-4567-789a-8bcd-ef0123456789");
 
     @Autowired private MockMvc mockMvc;
 
@@ -59,12 +62,13 @@ class PostSecurityTest {
     @DisplayName("공개 경로의 게시글 단건은 인증 없이 조회할 수 있다")
     void 공개_경로의_게시글_단건은_인증_없이_조회할_수_있다() throws Exception {
         // Given
-        given(postCommandUseCase.get(1L)).willReturn(new PostResult(1L, 2L, "제목", "본문", 3L));
+        given(postCommandUseCase.get(POST_ID))
+                .willReturn(new PostResult(POST_ID, 2L, "제목", "본문", 3L));
 
         // When & Then
-        mockMvc.perform(get("/open-api/v1/posts/{postId}", 1L))
+        mockMvc.perform(get("/open-api/v1/posts/{postId}", POST_ID))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(POST_ID.toString()));
     }
 
     @Test
@@ -85,13 +89,15 @@ class PostSecurityTest {
     @DisplayName("게시글 수정은 인증 없이 접근할 수 없다")
     void 게시글_수정은_인증_없이_접근할_수_없다() throws Exception {
         // When & Then
-        mockMvc.perform(patch("/api/v1/posts/{postId}", 1L)).andExpect(status().isUnauthorized());
+        mockMvc.perform(patch("/api/v1/posts/{postId}", POST_ID))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("게시글 삭제는 인증 없이 접근할 수 없다")
     void 게시글_삭제는_인증_없이_접근할_수_없다() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/v1/posts/{postId}", 1L)).andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/v1/posts/{postId}", POST_ID))
+                .andExpect(status().isUnauthorized());
     }
 }
