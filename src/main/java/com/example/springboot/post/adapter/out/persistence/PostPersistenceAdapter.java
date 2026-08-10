@@ -15,44 +15,26 @@ public class PostPersistenceAdapter implements PostRepositoryPort {
 
     @Override
     public Post save(Post post) {
-        PostJpaEntity saved =
-                repository.save(
-                        PostJpaEntity.of(
-                                post.getId(),
-                                post.getAuthorId(),
-                                post.getTitle(),
-                                post.getContent(),
-                                post.getViewCount()));
-
-        return toDomain(saved);
+        return repository.save(PostJpaEntity.from(post)).toDomain();
     }
 
     @Override
     public Optional<Post> findById(Long postId) {
-        return repository.findById(postId).map(this::toDomain);
+        return repository.findById(postId).map(PostJpaEntity::toDomain);
     }
 
     @Override
     public Optional<Post> findByIdForUpdate(Long postId) {
-        return repository.findByIdForUpdate(postId).map(this::toDomain);
+        return repository.findByIdForUpdate(postId).map(PostJpaEntity::toDomain);
     }
 
     @Override
     public List<Post> findAll() {
-        return repository.findAllByOrderByIdDesc().stream().map(this::toDomain).toList();
+        return repository.findAllByOrderByIdDesc().stream().map(PostJpaEntity::toDomain).toList();
     }
 
     @Override
     public void deleteById(Long postId) {
         repository.deleteById(postId);
-    }
-
-    private Post toDomain(PostJpaEntity entity) {
-        return Post.restore(
-                entity.getId(),
-                entity.getAuthorId(),
-                entity.getTitle(),
-                entity.getContent(),
-                entity.getViewCount());
     }
 }

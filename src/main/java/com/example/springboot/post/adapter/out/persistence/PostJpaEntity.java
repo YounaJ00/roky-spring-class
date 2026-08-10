@@ -1,11 +1,10 @@
 package com.example.springboot.post.adapter.out.persistence;
 
+import com.example.springboot.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,8 +35,16 @@ public class PostJpaEntity {
         this.viewCount = viewCount;
     }
 
-    public static PostJpaEntity of(
-            Long id, Long authorId, String title, String content, long viewCount) {
-        return new PostJpaEntity(id, authorId, title, content, viewCount);
+    static PostJpaEntity from(Post post) {
+        return new PostJpaEntity(
+                post.getId(),
+                post.getAuthorId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getViewCount());
+    }
+
+    Post toDomain() {
+        return Post.restore(id, authorId, title, content, viewCount);
     }
 }
