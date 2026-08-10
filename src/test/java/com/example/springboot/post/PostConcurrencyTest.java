@@ -6,7 +6,8 @@ import com.example.springboot.post.application.port.out.PostCommandPort;
 import com.example.springboot.post.application.service.PostCommandService;
 import com.example.springboot.post.domain.Post;
 import com.example.springboot.support.containers.MySqlTestContainerConfiguration;
-import com.example.springboot.user.application.port.out.UserRepositoryPort;
+import com.example.springboot.user.application.port.out.UserCommandPort;
+import com.example.springboot.user.application.port.out.UserQueryPort;
 import com.example.springboot.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,9 @@ class PostConcurrencyTest {
 
     @Autowired private PostCommandService postCommandService;
 
-    @Autowired private UserRepositoryPort userRepositoryPort;
+    @Autowired private UserCommandPort userCommandPort;
+
+    @Autowired private UserQueryPort userQueryPort;
 
     @Autowired private LostUpdateWorker lostUpdateWorker;
 
@@ -45,11 +48,11 @@ class PostConcurrencyTest {
     @BeforeEach
     void setUp() {
         User author =
-                userRepositoryPort
+                userQueryPort
                         .findByEmail("concurrency-test@example.com")
                         .orElseGet(
                                 () ->
-                                        userRepositoryPort.save(
+                                        userCommandPort.save(
                                                 User.register(
                                                         "concurrency-test@example.com",
                                                         "password123",

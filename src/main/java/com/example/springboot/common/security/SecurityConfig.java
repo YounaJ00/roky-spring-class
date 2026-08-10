@@ -1,6 +1,6 @@
 package com.example.springboot.common.security;
 
-import com.example.springboot.user.application.port.out.UserRepositoryPort;
+import com.example.springboot.user.application.port.out.UserQueryPort;
 import com.example.springboot.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,10 +30,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService userDetailsService(UserRepositoryPort userRepositoryPort) {
+    UserDetailsService userDetailsService(UserQueryPort userQueryPort) {
         return email -> {
             User user =
-                    userRepositoryPort
+                    userQueryPort
                             .findByEmail(email)
                             .orElseThrow(() -> new UsernameNotFoundException(email));
 

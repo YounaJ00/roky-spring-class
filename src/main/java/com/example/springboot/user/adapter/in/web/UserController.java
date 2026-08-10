@@ -5,7 +5,8 @@ import com.example.springboot.user.adapter.in.web.dto.LoginRequest;
 import com.example.springboot.user.adapter.in.web.dto.LoginResponse;
 import com.example.springboot.user.adapter.in.web.dto.SignupRequest;
 import com.example.springboot.user.adapter.in.web.dto.UserResponse;
-import com.example.springboot.user.application.port.in.UserUseCase;
+import com.example.springboot.user.application.port.in.UserCommandUseCase;
+import com.example.springboot.user.application.port.in.UserQueryUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,20 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserUseCase userUseCase;
+    private final UserCommandUseCase userCommandUseCase;
+    private final UserQueryUseCase userQueryUseCase;
 
     @PostMapping("/open-api/v1/auth/signup")
     public UserResponse signup(@Valid @RequestBody SignupRequest request) {
-        return UserMapper.toResponse(userUseCase.signup(UserMapper.toCommand(request)));
+        return UserMapper.toResponse(userCommandUseCase.signup(UserMapper.toCommand(request)));
     }
 
     @PostMapping("/open-api/v1/auth/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
-        return UserMapper.toResponse(userUseCase.login(UserMapper.toCommand(request)));
+        return UserMapper.toResponse(userCommandUseCase.login(UserMapper.toCommand(request)));
     }
 
     @GetMapping("/api/v1/users/me")
     public UserResponse getMe(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return UserMapper.toResponse(userUseCase.getMe(principal.getUserId()));
+        return UserMapper.toResponse(userQueryUseCase.getMe(principal.getUserId()));
     }
 }

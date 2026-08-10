@@ -182,9 +182,9 @@ com.example.springboot
 ├── user
 │   ├── domain                    # 프레임워크 비의존 User 도메인
 │   ├── application
-│   │   ├── port.in               # UserUseCase
-│   │   ├── port.out              # Repository/Auth/Token 포트
-│   │   └── service               # 유스케이스 구현과 트랜잭션 경계
+│   │   ├── port.in               # UserCommandUseCase, UserQueryUseCase
+│   │   ├── port.out              # UserCommandPort, UserQueryPort, Auth/Token 포트
+│   │   └── service               # 명령·조회 유스케이스와 트랜잭션 경계
 │   └── adapter
 │       ├── in.web                # 인증·사용자 HTTP 어댑터
 │       └── out                   # JPA 및 JWT/Security 어댑터

@@ -5,10 +5,9 @@ import com.example.springboot.user.application.port.in.dto.LoginResult;
 import com.example.springboot.user.application.port.in.dto.SignupCommand;
 import com.example.springboot.user.application.port.in.dto.UserResult;
 
-public interface UserUseCase {
+public interface UserCommandUseCase {
+
     UserResult signup(SignupCommand command);
 
     LoginResult login(LoginCommand command);
-
-    UserResult getMe(Long userId);
 }

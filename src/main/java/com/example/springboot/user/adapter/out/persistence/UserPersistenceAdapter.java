@@ -1,7 +1,8 @@
 package com.example.springboot.user.adapter.out.persistence;
 
 import com.example.springboot.common.exception.ApiException;
-import com.example.springboot.user.application.port.out.UserRepositoryPort;
+import com.example.springboot.user.application.port.out.UserCommandPort;
+import com.example.springboot.user.application.port.out.UserQueryPort;
 import com.example.springboot.user.domain.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UserPersistenceAdapter implements UserRepositoryPort {
+public class UserPersistenceAdapter implements UserCommandPort, UserQueryPort {
 
     private final UserJpaRepository repository;
 
