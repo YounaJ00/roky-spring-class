@@ -6,6 +6,7 @@ import com.example.springboot.post.application.port.in.dto.PostCommand;
 import com.example.springboot.post.application.port.in.dto.PostResult;
 import com.example.springboot.post.application.port.out.PostCommandPort;
 import com.example.springboot.post.domain.Post;
+import com.example.springboot.post.domain.exception.PostAuthorMismatchException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,7 +66,9 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     private void validateAuthor(Post post, UUID userId) {
-        if (!post.getAuthorId().equals(userId)) {
+        try {
+            post.validateAuthor(userId);
+        } catch (PostAuthorMismatchException exception) {
             throw new ApiException(HttpStatus.FORBIDDEN, "작성자만 변경할 수 있습니다.");
         }
     }

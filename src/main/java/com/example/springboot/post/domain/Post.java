@@ -1,5 +1,6 @@
 package com.example.springboot.post.domain;
 
+import com.example.springboot.post.domain.exception.PostAuthorMismatchException;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -37,5 +38,11 @@ public class Post {
 
     public void increaseViewCount() {
         viewCount++;
+    }
+
+    public void validateAuthor(UUID userId) {
+        if (!authorId.equals(userId)) {
+            throw new PostAuthorMismatchException();
+        }
     }
 }
