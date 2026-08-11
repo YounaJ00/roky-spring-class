@@ -1,15 +1,26 @@
 package com.example.springboot.common.exception;
 
-import lombok.Getter;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 
-@Getter
 public class ApiException extends RuntimeException {
 
-    private final HttpStatus status;
+    private final ErrorCode errorCode;
 
-    public ApiException(HttpStatus status, String message) {
-        super(message);
-        this.status = status;
+    public ApiException(ErrorCode errorCode) {
+        super(Objects.requireNonNull(errorCode, "errorCode must not be null").message());
+        this.errorCode = errorCode;
+    }
+
+    public HttpStatus getStatus() {
+        return errorCode.status();
+    }
+
+    public String getCode() {
+        return errorCode.code();
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
 }

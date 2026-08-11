@@ -1,6 +1,6 @@
 package com.example.springboot.common.exception;
 
-import org.springframework.http.HttpStatus;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,22 +12,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException exception) {
         return ResponseEntity.status(exception.getStatus())
-                .body(
-                        new ErrorResponse(
-                                exception.getStatus().value(),
-                                exception.getStatus().name(),
-                                exception.getMessage()));
+                .body(ErrorResponse.from(exception.getErrorCode()));
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
-    public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {
-        return ResponseEntity.badRequest()
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException exception) {
+        // 거절된 입력값은 비밀번호나 개인정보일 수 있으므로 field와 reason만 응답한다.
+        List<FieldValidationError> validationErrors =
+                exception.getBindingResult().getFieldErrors().stream()
+                        .map(
+                                fieldError ->
+                                        new FieldValidationError(
+                                                fieldError.getField(),
+                                                fieldError.getDefaultMessage()))
+                        .toList();
+
+        return ResponseEntity.status(ValidationErrorCode.INVALID_INPUT_VALUE.status())
                 .body(
-                        new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                HttpStatus.BAD_REQUEST.name(),
-                                "입력값이 올바르지 않습니다."));
+                        ErrorResponse.from(
+                                ValidationErrorCode.INVALID_INPUT_VALUE, validationErrors));
     }
 
-    public record ErrorResponse(int status, String error, String message) {}
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception) {
+        return ResponseEntity.status(ValidationErrorCode.BAD_REQUEST.status())
+                .body(ErrorResponse.from(ValidationErrorCode.BAD_REQUEST));
+    }
 }

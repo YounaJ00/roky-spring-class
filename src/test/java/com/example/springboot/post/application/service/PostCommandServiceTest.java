@@ -65,6 +65,7 @@ class PostCommandServiceTest {
                         ApiException.class,
                         exception -> {
                             assertThat(exception.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+                            assertThat(exception.getCode()).isEqualTo("POST_AUTHOR_REQUIRED");
                             assertThat(exception.getMessage()).isEqualTo("작성자만 변경할 수 있습니다.");
                         });
     }

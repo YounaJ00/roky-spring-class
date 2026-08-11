@@ -47,6 +47,7 @@ class UserCommandServiceTest {
                         ApiException.class,
                         exception -> {
                             assertThat(exception.getStatus()).isEqualTo(HttpStatus.CONFLICT);
+                            assertThat(exception.getCode()).isEqualTo("EMAIL_ALREADY_EXISTS");
                             assertThat(exception.getMessage()).isEqualTo("이미 사용 중인 이메일입니다.");
                         });
     }

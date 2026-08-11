@@ -1,5 +1,6 @@
 package com.example.springboot.post.adapter.in.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,6 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,6 +44,8 @@ class PostSecurityTest {
     private static final UUID AUTHOR_ID = UUID.fromString("0198a123-4567-789a-8bcd-ef0123456790");
 
     @Autowired private MockMvc mockMvc;
+
+    @Autowired private CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @MockitoBean private PostCommandUseCase postCommandUseCase;
 
@@ -83,7 +89,12 @@ class PostSecurityTest {
     @DisplayName("게시글 작성은 인증 없이 접근할 수 없다")
     void 게시글_작성은_인증_없이_접근할_수_없다() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/v1/posts")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/v1/posts"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("UNAUTHORIZED"))
+                .andExpect(jsonPath("$.message").value("인증에 실패했습니다."))
+                .andExpect(jsonPath("$.errors").isEmpty());
     }
 
     @Test
@@ -100,5 +111,25 @@ class PostSecurityTest {
         // When & Then
         mockMvc.perform(delete("/api/v1/posts/{postId}", POST_ID))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("접근 권한이 없으면 공통 403 오류 응답을 반환한다")
+    void 접근_권한이_없으면_공통_403_오류를_반환한다() throws Exception {
+        // Given
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // When
+        customAccessDeniedHandler.handle(
+                new MockHttpServletRequest(), response, new AccessDeniedException("forbidden"));
+
+        // Then
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getContentAsString())
+                .isEqualTo(
+                        """
+                        {"status":403,"error":"FORBIDDEN","message":"접근 권한이 없습니다.","errors":[]}
+                        """
+                                .trim());
     }
 }

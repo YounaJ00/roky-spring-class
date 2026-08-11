@@ -2,6 +2,7 @@ package com.example.springboot.user.application.service;
 
 import com.example.springboot.common.exception.ApiException;
 import com.example.springboot.user.application.exception.DuplicateEmailException;
+import com.example.springboot.user.application.exception.UserErrorCode;
 import com.example.springboot.user.application.port.in.UserCommandUseCase;
 import com.example.springboot.user.application.port.in.dto.LoginCommand;
 import com.example.springboot.user.application.port.in.dto.LoginResult;
@@ -14,7 +15,6 @@ import com.example.springboot.user.application.port.out.dto.AuthenticatedUser;
 import com.example.springboot.user.application.port.out.dto.IssuedToken;
 import com.example.springboot.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +58,6 @@ public class UserCommandService implements UserCommandUseCase {
     }
 
     private ApiException duplicateEmailConflict() {
-        return new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+        return new ApiException(UserErrorCode.EMAIL_ALREADY_EXISTS);
     }
 }

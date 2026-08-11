@@ -1,15 +1,20 @@
 package com.example.springboot.common.security.handler;
 
+import com.example.springboot.common.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
+@RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public void commence(
@@ -17,12 +22,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletResponse response,
             AuthenticationException exception)
             throws IOException {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(SecurityErrorCode.UNAUTHORIZED.status().value());
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter()
-                .write(
-                        """
-                {"status":401,"error":"UNAUTHORIZED","message":"인증에 실패했습니다."}
-                """);
+        objectMapper.writeValue(
+                response.getWriter(), ErrorResponse.from(SecurityErrorCode.UNAUTHORIZED));
     }
 }

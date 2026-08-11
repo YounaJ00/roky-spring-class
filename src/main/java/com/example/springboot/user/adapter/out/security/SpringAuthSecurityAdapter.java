@@ -2,10 +2,10 @@ package com.example.springboot.user.adapter.out.security;
 
 import com.example.springboot.common.exception.ApiException;
 import com.example.springboot.common.security.CustomUserPrincipal;
+import com.example.springboot.user.application.exception.AuthErrorCode;
 import com.example.springboot.user.application.port.out.AuthSecurityPort;
 import com.example.springboot.user.application.port.out.dto.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,13 +34,13 @@ public class SpringAuthSecurityAdapter implements AuthSecurityPort {
                                     email, rawPassword));
 
             if (!(authentication.getPrincipal() instanceof CustomUserPrincipal principal)) {
-                throw new ApiException(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다.");
+                throw new ApiException(AuthErrorCode.INVALID_CREDENTIALS);
             }
 
             return new AuthenticatedUser(principal.getUserId(), principal.getEmail());
 
         } catch (AuthenticationException exception) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new ApiException(AuthErrorCode.INVALID_CREDENTIALS);
         }
     }
 }
