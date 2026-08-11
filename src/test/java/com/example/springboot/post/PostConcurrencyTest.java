@@ -18,18 +18,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(
         properties = {
             "spring.datasource.hikari.maximum-pool-size=110",
             "spring.datasource.hikari.connection-timeout=10000"
         })
-@Import({MySqlTestContainerConfiguration.class, PostConcurrencyTest.TestConfig.class})
+@Import(MySqlTestContainerConfiguration.class)
 class PostConcurrencyTest {
 
     private static final int THREAD_COUNT = 100;
@@ -41,8 +37,6 @@ class PostConcurrencyTest {
     @Autowired private UserCommandPort userCommandPort;
 
     @Autowired private UserQueryPort userQueryPort;
-
-    @Autowired private LostUpdateWorker lostUpdateWorker;
 
     private UUID postId;
 
@@ -65,28 +59,12 @@ class PostConcurrencyTest {
     }
 
     @Test
-    @DisplayName("락이 없으면 조회수 증가가 유실된다")
-    void lostUpdateWithoutLock() throws Exception {
-        CountDownLatch allRead = new CountDownLatch(THREAD_COUNT);
-
-        runConcurrent(() -> lostUpdateWorker.increase(postId, allRead));
-
-        long viewCount = postCommandPort.findById(postId).orElseThrow().getViewCount();
-
-        System.out.println("[락 없음] 최종 조회수 = " + viewCount);
-
-        assertThat(viewCount).isLessThan(THREAD_COUNT);
-    }
-
-    @Test
-    @DisplayName("비관적 락 적용 후 조회수 100이 보장된다")
-    void pessimisticLockPreventsLostUpdate() throws Exception {
+    @DisplayName("동시에 100번 조회해도 조회수 증가가 모두 반영된다")
+    void concurrentViewsAreAllReflected() throws Exception {
 
         runConcurrent(() -> postCommandService.get(postId));
 
         long viewCount = postCommandPort.findById(postId).orElseThrow().getViewCount();
-
-        System.out.println("[비관적 락] 최종 조회수 = " + viewCount);
 
         assertThat(viewCount).isEqualTo(THREAD_COUNT);
     }
@@ -139,41 +117,4 @@ class PostConcurrencyTest {
         }
     }
 
-    @TestConfiguration(proxyBeanMethods = false)
-    static class TestConfig {
-
-        @Bean
-        LostUpdateWorker lostUpdateWorker(PostCommandPort postCommandPort) {
-            return new LostUpdateWorker(postCommandPort);
-        }
-    }
-
-    static class LostUpdateWorker {
-
-        private final PostCommandPort postCommandPort;
-
-        LostUpdateWorker(PostCommandPort postCommandPort) {
-            this.postCommandPort = postCommandPort;
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void increase(UUID postId, CountDownLatch allRead) {
-            Post post = postCommandPort.findById(postId).orElseThrow();
-
-            allRead.countDown();
-
-            try {
-                if (!allRead.await(20, TimeUnit.SECONDS)) {
-                    throw new IllegalStateException("동시 조회 대기 시간이 초과되었습니다.");
-                }
-            } catch (InterruptedException exception) {
-                Thread.currentThread().interrupt();
-                throw new IllegalStateException(exception);
-            }
-
-            post.increaseViewCount();
-
-            postCommandPort.save(post);
-        }
-    }
 }
