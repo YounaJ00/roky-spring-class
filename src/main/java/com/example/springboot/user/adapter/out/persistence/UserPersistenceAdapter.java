@@ -24,12 +24,12 @@ public class UserPersistenceAdapter implements UserCommandPort, UserQueryPort {
 
     @Override
     public Optional<User> findById(UUID id) {
-        return repository.findById(id).map(this::toDomain);
+        return repository.findById(id).map(UserJpaEntity::toDomain);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return repository.findByEmail(email).map(this::toDomain);
+        return repository.findByEmail(email).map(UserJpaEntity::toDomain);
     }
 
     @Override
@@ -39,13 +39,9 @@ public class UserPersistenceAdapter implements UserCommandPort, UserQueryPort {
                     repository.saveAndFlush(
                             UserJpaEntity.create(user.getEmail(), user.getEncodedPassword()));
 
-            return toDomain(saved);
+            return saved.toDomain();
         } catch (DataIntegrityViolationException exception) {
             throw new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
         }
-    }
-
-    private User toDomain(UserJpaEntity entity) {
-        return User.restore(entity.getId(), entity.getEmail(), entity.getPasswordHash());
     }
 }

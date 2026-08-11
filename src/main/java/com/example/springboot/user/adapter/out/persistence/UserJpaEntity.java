@@ -1,5 +1,6 @@
 package com.example.springboot.user.adapter.out.persistence;
 
+import com.example.springboot.user.domain.User;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -46,5 +47,9 @@ public class UserJpaEntity {
 
     public static UserJpaEntity create(String email, String passwordHash) {
         return new UserJpaEntity(email, passwordHash);
+    }
+
+    User toDomain() {
+        return User.restore(id, email, passwordHash);
     }
 }
