@@ -1,6 +1,7 @@
 package com.example.springboot.user.application.service;
 
 import com.example.springboot.common.exception.ApiException;
+import com.example.springboot.user.application.exception.DuplicateEmailException;
 import com.example.springboot.user.application.port.in.UserCommandUseCase;
 import com.example.springboot.user.application.port.in.dto.LoginCommand;
 import com.example.springboot.user.application.port.in.dto.LoginResult;
@@ -29,14 +30,19 @@ public class UserCommandService implements UserCommandUseCase {
     @Transactional
     public UserResult signup(SignupCommand command) {
         if (userCommandPort.existsByEmail(command.email())) {
-            throw new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+            throw duplicateEmailConflict();
         }
 
         String encodedPassword = authSecurityPort.encode(command.password());
 
         User user = User.register(command.email(), command.password(), encodedPassword);
 
-        User saved = userCommandPort.save(user);
+        User saved;
+        try {
+            saved = userCommandPort.save(user);
+        } catch (DuplicateEmailException exception) {
+            throw duplicateEmailConflict();
+        }
 
         return new UserResult(saved.getId(), saved.getEmail());
     }
@@ -49,5 +55,9 @@ public class UserCommandService implements UserCommandUseCase {
         IssuedToken token = tokenProviderPort.issue(authenticated.userId(), authenticated.email());
 
         return new LoginResult(token.value(), token.expiresAt());
+    }
+
+    private ApiException duplicateEmailConflict() {
+        return new ApiException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
     }
 }
