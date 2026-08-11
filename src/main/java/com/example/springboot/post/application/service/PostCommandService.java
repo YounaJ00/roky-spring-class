@@ -1,6 +1,7 @@
 package com.example.springboot.post.application.service;
 
 import com.example.springboot.common.exception.ApiException;
+import com.example.springboot.post.application.exception.PostErrorCode;
 import com.example.springboot.post.application.port.in.PostCommandUseCase;
 import com.example.springboot.post.application.port.in.dto.PostCommand;
 import com.example.springboot.post.application.port.in.dto.PostResult;
@@ -9,7 +10,6 @@ import com.example.springboot.post.domain.Post;
 import com.example.springboot.post.domain.exception.PostAuthorMismatchException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +31,7 @@ public class PostCommandService implements PostCommandUseCase {
         Post post =
                 postCommandPort
                         .findByIdForUpdate(postId)
-                        .orElseThrow(
-                                () -> new ApiException(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."));
+                        .orElseThrow(() -> new ApiException(PostErrorCode.POST_NOT_FOUND));
 
         post.increaseViewCount();
 
@@ -43,9 +42,11 @@ public class PostCommandService implements PostCommandUseCase {
     public PostResult update(UUID userId, UUID postId, PostCommand command) {
         Post post = findPost(postId);
 
-        validateAuthor(post, userId);
-
-        post.update(command.title(), command.content());
+        try {
+            post.update(userId, command.title(), command.content());
+        } catch (PostAuthorMismatchException exception) {
+            throw new ApiException(PostErrorCode.POST_AUTHOR_REQUIRED);
+        }
 
         return PostResult.from(postCommandPort.save(post));
     }
@@ -62,14 +63,14 @@ public class PostCommandService implements PostCommandUseCase {
     private Post findPost(UUID postId) {
         return postCommandPort
                 .findById(postId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(PostErrorCode.POST_NOT_FOUND));
     }
 
     private void validateAuthor(Post post, UUID userId) {
         try {
             post.validateAuthor(userId);
         } catch (PostAuthorMismatchException exception) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "작성자만 변경할 수 있습니다.");
+            throw new ApiException(PostErrorCode.POST_AUTHOR_REQUIRED);
         }
     }
 }

@@ -31,7 +31,9 @@ public class Post {
         return new Post(id, authorId, title, content, viewCount);
     }
 
-    public void update(String title, String content) {
+    public void update(UUID userId, String title, String content) {
+        validateAuthor(userId);
+
         this.title = title;
         this.content = content;
     }
