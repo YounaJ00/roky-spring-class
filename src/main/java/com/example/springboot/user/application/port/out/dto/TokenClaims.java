@@ -1,3 +1,5 @@
 package com.example.springboot.user.application.port.out.dto;
 
-public record TokenClaims(Long userId, String email) {}
+import java.util.UUID;
+
+public record TokenClaims(UUID userId, String email) {}

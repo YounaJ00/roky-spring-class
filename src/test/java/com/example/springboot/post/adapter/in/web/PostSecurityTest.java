@@ -37,6 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class PostSecurityTest {
 
     private static final UUID POST_ID = UUID.fromString("0198a123-4567-789a-8bcd-ef0123456789");
+    private static final UUID AUTHOR_ID = UUID.fromString("0198a123-4567-789a-8bcd-ef0123456790");
 
     @Autowired private MockMvc mockMvc;
 
@@ -63,7 +64,7 @@ class PostSecurityTest {
     void 공개_경로의_게시글_단건은_인증_없이_조회할_수_있다() throws Exception {
         // Given
         given(postCommandUseCase.get(POST_ID))
-                .willReturn(new PostResult(POST_ID, 2L, "제목", "본문", 3L));
+                .willReturn(new PostResult(POST_ID, AUTHOR_ID, "제목", "본문", 3L));
 
         // When & Then
         mockMvc.perform(get("/open-api/v1/posts/{postId}", POST_ID))

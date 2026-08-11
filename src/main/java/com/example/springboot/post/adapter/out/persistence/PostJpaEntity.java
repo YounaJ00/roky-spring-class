@@ -23,7 +23,7 @@ public class PostJpaEntity {
     private UUID id;
 
     @Column(name = "author_id", nullable = false)
-    private Long authorId;
+    private UUID authorId;
 
     @Column(nullable = false, length = 200)
     private String title;

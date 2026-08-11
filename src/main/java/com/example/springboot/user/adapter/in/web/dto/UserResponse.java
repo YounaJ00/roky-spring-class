@@ -1,3 +1,5 @@
 package com.example.springboot.user.adapter.in.web.dto;
 
-public record UserResponse(Long id, String email) {}
+import java.util.UUID;
+
+public record UserResponse(UUID id, String email) {}

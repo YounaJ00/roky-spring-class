@@ -2,9 +2,11 @@ package com.example.springboot.user.adapter.out.persistence;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,9 +21,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class UserJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private UUID id;
 
     @Column(nullable = false)
     private String email;

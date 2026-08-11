@@ -1,5 +1,6 @@
 package com.example.springboot.user.domain;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.Getter;
 
@@ -7,11 +8,11 @@ import lombok.Getter;
 public class User {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
-    private final Long id;
+    private final UUID id;
     private final String email;
     private final String encodedPassword;
 
-    private User(Long id, String email, String encodedPassword) {
+    private User(UUID id, String email, String encodedPassword) {
         validateEmail(email);
         validateEncodedPassword(encodedPassword);
 
@@ -29,7 +30,7 @@ public class User {
     }
 
     // 기존 회원 복원, id 있음
-    public static User restore(Long id, String email, String encodedPassword) {
+    public static User restore(UUID id, String email, String encodedPassword) {
         return new User(id, email, encodedPassword);
     }
 

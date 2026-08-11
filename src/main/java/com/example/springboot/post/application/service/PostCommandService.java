@@ -20,7 +20,7 @@ public class PostCommandService implements PostCommandUseCase {
     private final PostCommandPort postCommandPort;
 
     @Override
-    public PostResult create(Long userId, PostCommand command) {
+    public PostResult create(UUID userId, PostCommand command) {
         return PostResult.from(
                 postCommandPort.save(Post.create(userId, command.title(), command.content())));
     }
@@ -39,7 +39,7 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public PostResult update(Long userId, UUID postId, PostCommand command) {
+    public PostResult update(UUID userId, UUID postId, PostCommand command) {
         Post post = findPost(postId);
 
         validateAuthor(post, userId);
@@ -50,7 +50,7 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public void delete(Long userId, UUID postId) {
+    public void delete(UUID userId, UUID postId) {
         Post post = findPost(postId);
 
         validateAuthor(post, userId);
@@ -64,7 +64,7 @@ public class PostCommandService implements PostCommandUseCase {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."));
     }
 
-    private void validateAuthor(Post post, Long userId) {
+    private void validateAuthor(Post post, UUID userId) {
         if (!post.getAuthorId().equals(userId)) {
             throw new ApiException(HttpStatus.FORBIDDEN, "작성자만 변경할 수 있습니다.");
         }

@@ -6,11 +6,11 @@ import java.util.UUID;
 
 public interface PostCommandUseCase {
 
-    PostResult create(Long userId, PostCommand command);
+    PostResult create(UUID userId, PostCommand command);
 
     PostResult get(UUID postId);
 
-    PostResult update(Long userId, UUID postId, PostCommand command);
+    PostResult update(UUID userId, UUID postId, PostCommand command);
 
-    void delete(Long userId, UUID postId);
+    void delete(UUID userId, UUID postId);
 }

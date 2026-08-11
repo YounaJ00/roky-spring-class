@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ public class JwtTokenProvider implements TokenProviderPort {
     }
 
     @Override
-    public IssuedToken issue(Long userId, String email) {
+    public IssuedToken issue(UUID userId, String email) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plusMillis(expirationMillis);
 
@@ -50,6 +51,6 @@ public class JwtTokenProvider implements TokenProviderPort {
                 Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
         return new TokenClaims(
-                Long.valueOf(claims.getSubject()), claims.get("email", String.class));
+                UUID.fromString(claims.getSubject()), claims.get("email", String.class));
     }
 }

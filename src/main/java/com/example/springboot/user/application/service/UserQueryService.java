@@ -5,6 +5,7 @@ import com.example.springboot.user.application.port.in.UserQueryUseCase;
 import com.example.springboot.user.application.port.in.dto.UserResult;
 import com.example.springboot.user.application.port.out.UserQueryPort;
 import com.example.springboot.user.domain.User;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class UserQueryService implements UserQueryUseCase {
     private final UserQueryPort userQueryPort;
 
     @Override
-    public UserResult getMe(Long userId) {
+    public UserResult getMe(UUID userId) {
         User user =
                 userQueryPort
                         .findById(userId)

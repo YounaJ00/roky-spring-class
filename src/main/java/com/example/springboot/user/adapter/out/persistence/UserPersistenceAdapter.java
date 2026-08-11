@@ -5,6 +5,7 @@ import com.example.springboot.user.application.port.out.UserCommandPort;
 import com.example.springboot.user.application.port.out.UserQueryPort;
 import com.example.springboot.user.domain.User;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class UserPersistenceAdapter implements UserCommandPort, UserQueryPort {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(UUID id) {
         return repository.findById(id).map(this::toDomain);
     }
 
