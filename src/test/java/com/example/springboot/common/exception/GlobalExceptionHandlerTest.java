@@ -27,15 +27,12 @@ class GlobalExceptionHandlerTest {
         IllegalArgumentException exception = new IllegalArgumentException("invalid");
 
         // When
-        ResponseEntity<ErrorResponse> response =
-                handler.handleIllegalArgumentException(exception);
+        ResponseEntity<ErrorResponse> response = handler.handleIllegalArgumentException(exception);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody())
-                .isEqualTo(
-                        new ErrorResponse(
-                                400, "BAD_REQUEST", "입력값이 올바르지 않습니다.", List.of()));
+                .isEqualTo(new ErrorResponse(400, "BAD_REQUEST", "입력값이 올바르지 않습니다.", List.of()));
     }
 
     @ParameterizedTest
