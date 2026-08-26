@@ -22,10 +22,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Up JDK 17
-        uses: actions/setup-java@v4
+      - name: Set Up JDK 25
+        uses: actions/setup-java@v5
         with:
-          java-version: "17"
+          java-version: "25"
           distribution: "temurin"
           cache: gradle
 
@@ -55,12 +55,12 @@ jobs:
           retention-days: 30
 
       - name: 테스트 커버리지를 PR에 코멘트로 등록
-        if: always()
+        if: success() && github.event_name == 'pull_request'
         id: jacoco
-        uses: madrapps/jacoco-report@v1.2
+        uses: madrapps/jacoco-report@v1.8.0
         with:
           title: 📝 테스트 커버리지 리포트입니다
           paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 50
-          min-coverage-changed-files: 50
+          min-coverage-changed-lines: 50

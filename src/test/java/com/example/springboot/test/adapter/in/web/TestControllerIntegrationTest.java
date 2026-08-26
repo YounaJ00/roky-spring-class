@@ -30,7 +30,7 @@ class TestControllerIntegrationTest {
 
     private MvcTestResult create(String title, String content) {
         return mockMvc.post()
-                .uri("/api/tests")
+                .uri("/open-api/tests")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody(title, content))
                 .exchange();
@@ -38,7 +38,7 @@ class TestControllerIntegrationTest {
 
     private MvcTestResult update(long id, String title, String content) {
         return mockMvc.put()
-                .uri("/api/tests/" + id)
+                .uri("/open-api/tests/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody(title, content))
                 .exchange();
@@ -111,7 +111,7 @@ class TestControllerIntegrationTest {
         Instant respondedUpdatedAt = Instant.parse(json(updated).get("updatedAt").asString());
         assertThat(respondedUpdatedAt).as("flush 이전 값을 응답하면 생성 시각에 머무른다").isAfter(createdAt);
 
-        JsonNode refetched = json(mockMvc.get().uri("/api/tests/" + id).exchange());
+        JsonNode refetched = json(mockMvc.get().uri("/open-api/tests/" + id).exchange());
         Instant storedUpdatedAt = Instant.parse(refetched.get("updatedAt").asString());
         assertThat(respondedUpdatedAt)
                 .as("응답한 수정 시각과 저장된 수정 시각이 달라선 안 된다")
@@ -139,11 +139,11 @@ class TestControllerIntegrationTest {
         long id = createAndGetId("지울 제목", "지울 본문");
 
         // When
-        MvcTestResult deleted = mockMvc.delete().uri("/api/tests/" + id).exchange();
+        MvcTestResult deleted = mockMvc.delete().uri("/open-api/tests/" + id).exchange();
 
         // Then
         assertThat(deleted).hasStatus(HttpStatus.NO_CONTENT);
-        JsonNode remaining = json(mockMvc.get().uri("/api/tests").exchange());
+        JsonNode remaining = json(mockMvc.get().uri("/open-api/tests").exchange());
         assertThat(remaining.valueStream().anyMatch(node -> node.get("id").asLong() == id))
                 .as("삭제가 반영되지 않으면 목록에 그대로 남는다")
                 .isFalse();
@@ -156,7 +156,7 @@ class TestControllerIntegrationTest {
         long id = createAndGetId("목록 제목", "목록 본문");
 
         // When
-        MvcTestResult result = mockMvc.get().uri("/api/tests").exchange();
+        MvcTestResult result = mockMvc.get().uri("/open-api/tests").exchange();
 
         // Then
         assertThat(result).hasStatus(HttpStatus.OK);
@@ -177,7 +177,7 @@ class TestControllerIntegrationTest {
         long id = createAndGetId("긴 본문", longContent);
 
         // Then
-        JsonNode refetched = json(mockMvc.get().uri("/api/tests/" + id).exchange());
+        JsonNode refetched = json(mockMvc.get().uri("/open-api/tests/" + id).exchange());
         assertThat(refetched.get("content").asString())
                 .as("본문이 TEXT가 아닌 기본 VARCHAR(255)로 매핑되면 저장 시점에 잘린다")
                 .isEqualTo(longContent);

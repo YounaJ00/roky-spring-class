@@ -19,16 +19,20 @@ import com.example.springboot.test.application.port.in.UpdateTestUseCase;
 import com.example.springboot.test.application.port.in.dto.CreateTestCommand;
 import com.example.springboot.test.application.port.in.dto.TestResult;
 import com.example.springboot.test.application.port.in.dto.UpdateTestCommand;
+import com.example.springboot.user.application.port.out.TokenProviderPort;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(TestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("TestController")
 class TestControllerTest {
 
@@ -47,6 +51,10 @@ class TestControllerTest {
 
     @MockitoBean private DeleteTestUseCase deleteTestUseCase;
 
+    @MockitoBean private TokenProviderPort tokenProviderPort;
+
+    @MockitoBean private AuthenticationEntryPoint authenticationEntryPoint;
+
     @org.junit.jupiter.api.Test
     @DisplayName("생성 요청은 201과 생성된 리소스를 반환한다")
     void 생성_요청은_201을_반환한다() throws Exception {
@@ -56,7 +64,7 @@ class TestControllerTest {
 
         // When & Then
         mockMvc.perform(
-                        post("/api/tests")
+                        post("/open-api/tests")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
@@ -77,7 +85,7 @@ class TestControllerTest {
                 .willReturn(new TestResult(1L, "제목", "본문", CREATED_AT, UPDATED_AT));
 
         // When & Then
-        mockMvc.perform(get("/api/tests/{id}", 1L))
+        mockMvc.perform(get("/open-api/tests/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("제목"))
@@ -97,7 +105,7 @@ class TestControllerTest {
                                 new TestResult(2L, "두 번째", "본문2", CREATED_AT, CREATED_AT)));
 
         // When & Then
-        mockMvc.perform(get("/api/tests"))
+        mockMvc.perform(get("/open-api/tests"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -113,7 +121,7 @@ class TestControllerTest {
         given(listTestsUseCase.list()).willReturn(List.of());
 
         // When & Then
-        mockMvc.perform(get("/api/tests"))
+        mockMvc.perform(get("/open-api/tests"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
@@ -127,7 +135,7 @@ class TestControllerTest {
 
         // When & Then
         mockMvc.perform(
-                        put("/api/tests/{id}", 1L)
+                        put("/open-api/tests/{id}", 1L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
@@ -143,7 +151,7 @@ class TestControllerTest {
     @DisplayName("삭제 요청은 204와 빈 본문을 반환한다")
     void 삭제_요청은_204를_반환한다() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/tests/{id}", 1L))
+        mockMvc.perform(delete("/open-api/tests/{id}", 1L))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
         then(deleteTestUseCase).should().delete(1L);
@@ -154,7 +162,7 @@ class TestControllerTest {
     void 요청_값이_비어있으면_400을_반환한다() throws Exception {
         // When & Then
         mockMvc.perform(
-                        post("/api/tests")
+                        post("/open-api/tests")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
